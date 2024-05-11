@@ -1,0 +1,367 @@
+<!DOCTYPE html><html><head><title>Watch</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
+<div class="container main my-5"><div class="row"><main class="col post">
+<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Watch</h1><small>檔名：<code>options-watch.html</code></small></div>
+<!-- 🔥🔥練習開始🔥🔥 -->
+
+<div id="app">
+	
+	<!-- watch 監聽單一變數 -->
+	<h2>watch 監聽單一變數</h2>
+	<label for="name">名字須超過十個字：</label>
+	<input type="text" id="name" v-model="tempName">
+	<P>result: {{ result }}</P>
+	<p>name: {{ name }}</p>
+	
+	<hr>
+	
+	<!-- watch 深層監聽 (監聽物件) -->
+	<h2>watch 深層監聽 (監聽物件)</h2>
+	
+	<label for="productName">商品名稱：</label>
+	<input type="text" v-model="product.name">
+	<br>
+	
+	<label for="productPrice">商品價格：</label>
+	<input type="number" v-model.number="product.price">
+	<br>
+	
+	<label class="mb-3">
+		<input type="checkbox" v-model="product.vegan"> 素食
+	</label>
+	
+	<p>深層監聽結果：{{ deepResult }}</p>
+	
+	<hr>
+	
+	<!-- Watch v.s. Computed -->
+	<h2>Watch v.s. Computed</h2>
+	
+	<p style="font-weight: bold; text-decoration: underline;">Watch</p>
+	<ul>
+		<li>監聽單一 “變數” 觸發事件</li>
+		<li>該函式可同時操作多個變數</li>
+	</ul>
+
+	<p style="font-weight: bold; text-decoration: underline;">Computed</p>
+	<ul>
+		<li>監聽多個變數觸發事件</li>
+		<li>會產生一個值</li>
+	</ul>
+	
+	<div class="box">
+		<div class="grid">
+			<label for="productName">商品名稱：</label>
+			<input type="text" v-model="productName">
+		</div>
+		
+		<div class="grid">
+			<label for="productPrice">商品價格：</label>
+			<input type="number" v-model.number="productPrice">
+		</div>
+		
+		<div class="grid">
+			<label>
+				<input type="checkbox" v-model="productVegan"> 素食
+			</label>
+		</div>
+	</div>
+	
+	<p>Computed 結果：{{ computedResult }}</p>
+	<p>Watch 結果：{{ watchResult }}</p>
+	
+</div>
+
+<hr style="border: 1px dotted yellow;">
+
+<!-- Watch -->
+<h3>Watch</h3>
+<p>適合使用於「當某個值改變時，其它幾個值也要跟著改變」的情境。</p>
+
+<div id="watchApp">
+	
+	<div class="box">
+		Number A：<input type="number" v-model="numA">
+	</div>
+	
+	<p>Number B = {{ numB }} (Number A + 1)</p>
+	<p>Number C = {{ numC }} (Number A + 2)</p>
+	<p>Number D = {{ numD }} (Number A + 3)</p>
+	
+</div>
+
+<hr style="border: 1px dotted yellow;">
+
+<!-- Computed -->
+<h3>Computed</h3>
+<p>適合使用於「某個值會受到好幾個值的影响而改變」。</p>
+
+<div id="computedApp">
+	
+	<div class="box">
+		<div class="grid">
+			Number B：<input type="number" v-model="numB">
+		</div>
+		
+		<div class="grid">
+			Number C：<input type="number" v-model="numC">
+		</div>
+		
+		<div class="grid">
+			Number D：<input type="number" v-model="numD">
+		</div>
+	</div>
+	
+	<p>Number A = {{ numA }} (B + C + D)</p>
+	
+</div>
+
+<script>
+
+const App = {
+	data() {
+		return {
+			tempName: '',
+			name: '',
+			result: '',
+			deepResult: '',	// watch 深層監聽結果
+			watchResult: '',	// Watch v.s. Computed (Watch 結果)
+			
+			// 單一產品
+			productName: '蛋餅',
+			productPrice: 30,
+			productVegan: false,
+			
+			// 單一產品物件 (watch 深層監聽)
+			product: {
+				name: '蛋餅',
+				price: 30,
+				vegan: false
+			},
+		}
+	},
+	
+	methods: {
+		getResult () {
+			console.log(`methods [getResult]... `);
+			return `媽媽買了 ${this.productName}，總共花費 ${this.productPrice} 元，另外這 ${this.productVegan? '是' : '不是'} 素食的`;
+		},
+		setWatchResult () {
+			this.watchResult = this.getResult();
+		},
+	},
+	
+	/*
+		Watch v.s. Computed
+		Computed 只需要寫一個函式監聽所有變數。
+	*/
+	computed: {
+		computedResult () {
+			console.log(``);
+			console.log(`========== [Computed] computedResult() ==========`);
+			return this.getResult();
+		},
+	},
+	
+	watch:
+	{
+		/* watch 監聽單一變數 */
+		tempName (n, o)
+		{
+			console.log(`========== [Watch] [tempName] ==========`);
+			console.log(`new = ${n}, old = ${o}`);
+			
+			if (n.length < 10) {
+				this.result = `輸入的文字僅有 ${n.length} 個字，上一次有 ${o.length} 個字`;
+			}
+			else {
+				this.result = `文字長度為 ${n.length} 個字，將儲存至變數中`;
+				this.name = n;
+			}
+		},
+		
+		/* watch 深層監聽 (監聽物件) */
+		product: {
+			deep: true,	// 為深層監聽
+			handler (n, o) {	// 控制器
+				console.log(``);
+				console.log(`========== [Watch] [product] ==========`);
+				console.log(`new ==>`, n);
+				console.log(`old ==>`, o);
+				this.deepResult = `媽媽買了 ${this.product.name}，總共花費 ${this.product.price} 元，另外這 ${this.product.vegan? '是' : '不是'} 素食的`;
+			},
+		},
+		
+		/*
+			Watch v.s. Computed
+			每個變數都要寫相對應的 Watch 函式。
+		*/
+		productName (n, o) {
+			console.log(``);
+			console.log(`========== [Watch] [productName] ==========`);
+			console.log(`new = ${n}, old = ${o}`);
+			this.setWatchResult();
+		},
+		productPrice (n, o) {
+			console.log(``);
+			console.log(`========== [Watch] [productPrice] ==========`);
+			console.log(`new = ${n}, old = ${o}`);
+			this.setWatchResult();
+		},
+		productVegan (n, o) {
+			console.log(``);
+			console.log(`========== [Watch] [productVegan] ==========`);
+			console.log(`new = ${n}, old = ${o}`);
+			this.setWatchResult();
+		},
+	},
+};
+Vue.createApp(App).mount('#app');
+
+
+/* Watch */
+const WatchApp = {
+	data() {
+		return {
+			numA: 0,
+			numB: 0,
+			numC: 0,
+			numD: 0
+		}
+	},
+	watch: {
+		numA (n, o) {
+			this.numB = n + 1;
+			this.numC = n + 2;
+			this.numD = n + 3
+		}
+	}
+};
+Vue.createApp(WatchApp).mount("#watchApp");
+
+
+/* Computed */
+const ComputedApp = {
+	data() {
+		return {
+			numB: 0,
+			numC: 0,
+			numD: 0
+		}
+	},
+	computed: {
+		numA () {
+			return this.numB + this.numC + this.numD;
+		},
+	}
+};
+Vue.createApp(ComputedApp).mount("#computedApp");
+
+</script>
+
+
+<!-- 🙇🙇練習結束🙇🙇 -->
+</main>
+  
+    <aside
+      class="col-md-3"><div class="sticky-top" style="top: 76px">
+  <div class="list-group">
+  
+    <a href="/optionsApi/options-api.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      option API
+    </a>
+  
+    <a href="/optionsApi/options-methods.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Methods
+    </a>
+  
+    <a href="/optionsApi/options-computed.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Computed
+    </a>
+  
+    <a href="/optionsApi/options-watch.html"
+      class="list-group-item list-group-item-action
+        
+        active">
+      Watch
+    </a>
+  
+    <a href="/optionsApi/options-life-cycle.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      元件生命週期
+    </a>
+  
+    <a href="/optionsApi/options-final.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      章節挑戰
+    </a>
+  
+  </div>
+  <div class="mt-3 text-end p-2 bg-light rounded">
+    <small class="text-black-50 fw-light mb-0">文件版本：2022/11/1</small>
+  </div>
+</div>
+
+</aside>
+    
+  </div>
+</div>
+
+<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-secondary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Vue 3 練習手冊</a>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link " href="/es6/shorthand.html">JS 必備觀念</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/intro/createApp.html">認識 Vue.js</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/template/v-text.html">模板</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/optionsApi/options-methods.html">方法</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/components/component_register.html">元件</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/advApi/adv-refs.html">進階</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/router/vue-router.html">路由</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/composition/proxy.html">Composition API</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/pinia/layout.html">Pinia</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<footer class="footer py-2 bg-light">
+  <div class="container text-center">
+    <small class="text-black-50 fw-light mb-0">六角學院 Vue 課程專屬文件</small>
+  </div>
+</footer>
+<link rel="stylesheet" href="/stylesheets/all.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</body>
+</html>

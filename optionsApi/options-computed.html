@@ -1,0 +1,316 @@
+<!DOCTYPE html><html><head><title>Computed</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
+<div class="container main my-5"><div class="row"><main class="col post">
+<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Computed</h1><small>檔名：<code>options-computed.html</code></small></div>
+<!-- 🔥🔥練習開始🔥🔥 -->
+
+<div id="app">
+	
+	<h2>綁定畫面</h2>
+	<p>執行 computed test1()：{{ test1 }}</p>
+	<button type="button" @click="test1 = 'aaa'">更新</button>
+	<p>因為這邊的 computed 為函式，只能讀不能寫，因此會發生錯誤：<br>Write operation failed: computed property "test1" is readonly.</p>
+	
+	<br><hr><br>
+	
+	<h2>Computed 常見技巧 - 搜尋</h2>
+	<input type="search" v-model="search">
+	
+	<h3>菜單</h3>
+	<ul>
+		<li v-for="item in filterProducts">
+			{{ item.name }} / {{ item.price }}
+		</li>
+	</ul>
+	
+	<br><hr><br>
+	
+	<h2>Computed 將目前的數值運算呈現至畫面上</h2>
+	
+	<h3>菜單</h3>
+	<ul>
+		<li v-for="product in products">
+			{{ product.name }} / {{ product.price }}&nbsp;
+			<button type="button" @click="addToCart(product)">加入購物車</button>
+		</li>
+	</ul>
+	
+	<h3>購物車項目</h3>
+	<ul>
+		<li v-for="item in carts">{{ item.name }}</li>
+	</ul>
+	total 的值：{{ total }}<br>
+	
+</div>
+
+<br><hr><br>
+
+<div id="app2">
+	<h2>承上購物車，計算折扣後金額</h2>
+	<p>Computed Getter, Setter 測試</p>
+	<br>
+	總計：{{ amount }}<br>
+	折扣：
+	<input type="number" v-model.number="discount">&nbsp;
+	<button type="button" @click="amount = discount">計算</button>
+	<br>
+	折扣後金額：{{ sum }}
+</div>
+
+<br>
+
+
+<script>
+
+const products = [
+	{
+		name: '蔥蛋',
+		price: 20,
+		vegan: false
+	},
+	{
+		name: '蛋餅',
+		price: 30,
+		vegan: false
+	},
+	{
+		name: '起司蛋餅',
+		price: 35,
+		vegan: false
+	},
+	{
+		name: '火腿蛋餅',
+		price: 40,
+		vegan: false
+	},
+	{
+		name: '飯糰',
+		price: 35,
+		vegan: false
+	},
+	{
+		name: '小籠包',
+		price: 60,
+		vegan: false
+	},
+	{
+		name: '蘿蔔糕',
+		price: 30,
+		vegan: true
+	},
+];
+
+const cartsA = [];
+
+function count() {
+	console.log(`count() ......`);
+	return this.carts.reduce((accu, item) => accu + item.price, 0);
+}
+
+
+/*
+	1. Vue 物件裡面不能直接使用外面的東西，所以即使在外面定義了變數及 function，也得拉進來自己一份。
+	2. 而拉進來的物件，對其操作也會連帶改變外面的物件 (物件傳參考)。
+	3. 因此當多個 Vue 物件想要共用同一份資料時，可以在外面定義好物件，再各自拉進來。(但這種作法不知道是不是正規作法，這邊僅用來驗證此特性)
+*/
+const App = {
+	data() {
+		return {
+			search: '',
+			products,
+			carts: cartsA,
+		}
+	},
+	computed: {
+		test1() {
+			console.log(``);
+			console.log(`========== computed test1() ==========`);
+			return `我是 test1`;
+		},
+		filterProducts() {
+			console.log(``);
+			console.log(`========== computed filterProducts() ==========`);
+			console.log(`search ==>`, this.search);
+			
+			// indexOf
+			// const result = this.products.filter(item => item.name.indexOf(this.search) >= 0);
+			
+			// match
+			// const result = this.products.filter(item => item.name.match(this.search));
+			
+			// includes
+			const result = this.products.filter(item => item.name.includes(this.search));
+			
+			console.log(`result ==>`, result);
+			return result;
+		},
+		total() {
+			console.log(``);
+			console.log(`========== computed total() ==========`);
+			// return this.carts.reduce((accu, item) => accu + item.price, 0);
+			return this.count();
+		},
+	},
+	methods: {
+		addToCart(product) {
+			this.carts.push(product)
+		},
+		count
+	},
+	created() {
+		console.log(``);
+		console.log(`App1 Created ==>`, this);
+	}
+};
+Vue.createApp(App).mount('#app');
+
+
+const App2 = {
+	data() {
+		return {
+			carts: cartsA,
+			totalCount: 0,
+			discount: 0.5,
+			sum: 0
+		}
+	},
+	computed: {
+		amount: {
+			get() {
+				console.log(``);
+				console.log(`========== amount.get() ==========`);
+				// this.totalCount = this.carts.reduce((accu, item) => accu + item.price, 0);
+				this.totalCount = this.count();
+				return this.totalCount;
+			},
+			set(val) {
+				console.log(``);
+				console.log(`========== amount.set() ==========`);
+				console.log(`amount set() val = ${val}, discount = ${this.discount}`);
+				this.sum = this.totalCount * val;
+				console.log(`sum = ${this.sum}`);
+			}
+		},
+	},
+	methods: {
+		count,
+		setTest11(val) {
+			this.test11 = val;
+		}
+	},
+	created() {
+		console.log(``);
+		console.log(``);
+		console.log(`App2 Created ==>`, this);
+	}
+};
+Vue.createApp(App2).mount('#app2');
+
+</script>
+
+
+<!-- 🙇🙇練習結束🙇🙇 -->
+</main>
+  
+    <aside
+      class="col-md-3"><div class="sticky-top" style="top: 76px">
+  <div class="list-group">
+  
+    <a href="/optionsApi/options-api.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      option API
+    </a>
+  
+    <a href="/optionsApi/options-methods.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Methods
+    </a>
+  
+    <a href="/optionsApi/options-computed.html"
+      class="list-group-item list-group-item-action
+        
+        active">
+      Computed
+    </a>
+  
+    <a href="/optionsApi/options-watch.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Watch
+    </a>
+  
+    <a href="/optionsApi/options-life-cycle.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      元件生命週期
+    </a>
+  
+    <a href="/optionsApi/options-final.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      章節挑戰
+    </a>
+  
+  </div>
+  <div class="mt-3 text-end p-2 bg-light rounded">
+    <small class="text-black-50 fw-light mb-0">文件版本：2022/11/1</small>
+  </div>
+</div>
+
+</aside>
+    
+  </div>
+</div>
+
+<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-secondary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Vue 3 練習手冊</a>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link " href="/es6/shorthand.html">JS 必備觀念</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/intro/createApp.html">認識 Vue.js</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/template/v-text.html">模板</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/optionsApi/options-methods.html">方法</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/components/component_register.html">元件</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/advApi/adv-refs.html">進階</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/router/vue-router.html">路由</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/composition/proxy.html">Composition API</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/pinia/layout.html">Pinia</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<footer class="footer py-2 bg-light">
+  <div class="container text-center">
+    <small class="text-black-50 fw-light mb-0">六角學院 Vue 課程專屬文件</small>
+  </div>
+</footer>
+<link rel="stylesheet" href="/stylesheets/all.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</body>
+</html>

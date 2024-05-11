@@ -1,0 +1,442 @@
+<!DOCTYPE html><html><head><title>元件註冊</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
+<div class="container main my-5"><div class="row"><main class="col post">
+<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">元件註冊</h1><small>檔名：<code>component_register.html</code></small></div>
+<!-- 🔥🔥練習開始🔥🔥 -->
+
+<div id="app">
+	
+	<!-- 元件基本範例及結構 (全域) -->
+	<h2>元件基本範例及結構（全域）</h2>
+	
+	<div class="box">
+		<p>元件使用的基本要點：</p>
+		
+		<ul>
+			<li>元件需要在 createApp 後，mount 前進行定義。</li>
+			<li>元件需指定一個名稱，每個元件名稱都是獨立的，不重複。</li>
+			<li>元件結構與最外層的根元件結構無異（除了增加 Template 的片段）。</li>
+			<li>元件另有 prop、emits 等資料傳遞及事件傳遞。</li>
+		</ul>
+	</div>
+	
+	
+	<!-- 載入元件 -->
+	<global></global>
+	
+	<hr>
+	
+	
+	<!-- 不同元件的註冊方式 -->
+	<h2>不同元件的註冊方式</h3>
+	
+	<!-- 全域註冊 -->
+	<h3>全域註冊</h3>
+	<p>此 createApp 下，任何子元件都可運用，在中小型專案、一般頁面開發很方便。</p>
+	
+	<br>
+	
+	<h4>範例一</h4>
+	<global1></global1>
+	
+	<br>
+	
+	<h4>範例二</h4>
+	<global2></global2>
+	
+	<br>
+	
+	<h4>範例三</h4>
+	<global3></global3>
+	
+	<!--
+		無法使用子元件下的區域元件，會被認為元件不存在而發生警告：
+		[Vue warn]: Failed to resolve component: local2
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+	-->
+	<!-- <local2></local2> -->
+	
+	<br>
+	
+	<!-- 區域註冊 -->
+	<h3>區域註冊</h3>
+	<p>
+		直接在元件的定義物件中加入 components 屬性，註冊於其中。<br>
+		會限制在特定元件下才可使用，在 Vue Cli 中很常使用此方法（便於管理）。
+	</p>
+	
+	<!-- 載入元件 -->
+	<local1></local1>
+	
+	<br>
+	
+	<!-- 模組化 -->
+	<h3>模組化</h3>
+	<p>
+		將元件獨立為另一個檔案，透過 ESModule 的方式進行匯入。<br>
+		同屬於區域註冊，Vue Cli 中的實戰運用技巧。
+	</p>
+	
+	<!-- 載入元件 -->
+	<module1></module1>
+	<br>
+	<module2></module2>
+	
+	<hr>
+	
+	<!-- 測試元件命名 -->
+	<h2>測試 HTML 標籤名稱與元件命名對應</h2>
+	
+	<div class="box">
+		<p class="highlight">標籤名稱類型：&lt;com-module1></p>
+		<p><span class="bold">元件可用命名：</span>comModule1、ComModule1、com-module1（大小寫敏感）</p>
+	</div>
+	
+	<label>&lt;com-module1></label>
+	<com-module1></com-module1>
+	
+	<label>&lt;COM-MODULE1></label>
+	<COM-MODULE1></COM-MODULE1>
+	
+	<label>&lt;com-Module1></label>
+	<com-Module1></com-Module1>
+	
+	<label>&lt;Com-Module1></label>
+	<Com-Module1></Com-Module1>
+	
+	<br>
+	
+	<div class="box">
+		<p class="highlight">標籤名稱類型：&lt;commodule1></p>
+		<p><span class="bold">元件可用命名：</span>commodule1、Commodule1</p>
+	</div>
+	
+	<label>&lt;commodule1></label>
+	<commodule1></commodule1>
+	
+	<label>&lt;COMMODULE1></label>
+	<COMMODULE1></COMMODULE1>
+	
+	<label>&lt;comModule1></label>
+	<comModule1></comModule1>
+	
+	<label>&lt;ComModule1></label>
+	<ComModule1></ComModule1>
+	
+	<label>&lt;Commodule1></label>
+	<Commodule1></Commodule1>
+	
+</div>
+
+
+
+<script type="module">
+
+import {comModule1, comModule2} from "./componentModule.js";
+// import {comModule1, comModule2} from "https://codepen.io/codepenplayer/pen/abrbQLX.js";
+
+const app = Vue.createApp({
+	data() {
+		return {
+			text: '外部元件文字',
+		};
+	},
+	
+	/*
+		在根元件下註冊的區域元件
+		只能在根元件下使用，無法在其它子元件中使用。
+	*/
+	components: {
+		"local1": {
+			data() {
+				return {
+					text: '區域註冊範例 (local1)'
+				};
+			},
+			template: `<div class="alert alert-primary" role="alert">`
+				+ `{{ text }}`
+				// 區域元件也可以使用全域元件
+				+ `<global></global>`
+				+ `</div>`
+		},
+		
+		"module1": comModule1,
+		
+		
+		/*
+			元件的名稱測試
+		*/
+		/*
+			標籤名稱類型：com-module1
+			元件命名：完全一樣的小寫名稱、小駝峰、大駝峰
+		*/
+		// 可以
+		// "com-module1": comModule1,
+		comModule1,
+		// "comModule1": comModule1,
+		// "ComModule1": comModule1,
+		// 不行
+		// "COMMODULE1": comModule1,
+		// "commodule1": comModule1,
+		// "COM-MODULE1": comModule1,
+		// "Com-module1": comModule1,
+		// "Com-Module1": comModule1,
+		
+		/*
+			標籤名稱：commodule1
+			元件命名：完全一樣的小寫名稱、完全一樣首字大寫
+		*/
+		// 可以
+		"commodule1": comModule1,
+		// "Commodule1": comModule1,
+		// 不行
+		// "COMMODULE1": comModule1,
+		// "comModule1": comModule1,
+		// "ComModule1": comModule1,
+		
+	}
+	
+}).component('global', {
+	data() {
+		return {
+			text: '元件基本範例及結構 (全域) (global)'
+		};
+	},
+	template: `<div class="alert alert-primary" role="alert">
+{{ text }}
+</div>`
+});
+
+
+app.component('global1', {
+	data() {
+		return {
+			text: '全域註冊範例 1 (global1)'
+		};
+	},
+	
+	// 在子元件下註冊的區域元件
+	components: {
+		"local2": {
+			data() {
+				return {
+					text: '「全域註冊範例 1 (global1)」所定義的區域註冊元件 (local2)'
+				};
+			},
+			template: `<div class="alert alert-primary" role="alert">`
+				+ `{{ text }}`
+				+ `</div>`
+		}
+	},
+	
+	template: `<div class="alert alert-primary" role="alert">{{ text }}`
+
+		// 可以加入其它全域元件
+		+ `<global></global>`
+		+ `<global2></global2>`
+		
+		/*
+			若加入的元件也有使用到自己，彼此互相使用會造成無窮狀態，而發生錯誤：
+			RangeError: Maximum call stack size exceeded
+		*/
+		// + `<global3></global3>`
+		
+		/*
+			無法使用根元件的區域元件，會被視為不存在的元件而發生警告：
+			[Vue warn]: Failed to resolve component: local1
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+		*/
+		// + `<local1></local1>`
+		
+		// 可以使用元件本身定義的區域元件
+		+ `<local2></local2>`
+		
+		// 全域模組元件
+		+ `<module2></module2>`
+		
+		+ `</div>`
+});
+
+
+app.component('global2', {
+	data() {
+		return {
+			text: '全域註冊範例 2 (global2)'
+		};
+	},
+	template: `<div class="alert alert-primary" role="alert">{{ text }}`
+		
+		/*
+			無法使用其它元件所註冊的區域元件，會被視為不存在的元件而發生警告：
+			[Vue warn]: Failed to resolve component: local2
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement.
+		*/
+		// + `<local2></local2>`
+		
+		+ `</div>`
+});
+
+
+app.component('global3', {
+	data() {
+		return {
+			text: '全域註冊範例 3 (global3)'
+		};
+	},
+	template: `<div class="alert alert-primary" role="alert">{{ text }}`
+		
+		// 加入 global1 全域元件
+		+ `<global1></global1>`
+		
+		/*
+			若使用到不存在的元件，會發生警告：
+			[Vue warn]: Failed to resolve component: globalaaa
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+		*/
+		// + `<globalaaa></globalaaa>`
+		
+		+ `</div>`
+});
+
+// 模組化元件
+app.component('module2', comModule2);
+
+app.mount('#app');
+
+</script>
+
+
+
+<!-- 🙇🙇練習結束🙇🙇 -->
+</main>
+  
+    <aside
+      class="col-md-3"><div class="sticky-top" style="top: 76px">
+  <div class="list-group">
+  
+    <a href="/components/component_register.html"
+      class="list-group-item list-group-item-action
+        
+        active">
+      元件註冊
+    </a>
+  
+    <a href="/components/component_template.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      元件樣板及綁定方式
+    </a>
+  
+    <a href="/components/component_props.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Props
+    </a>
+  
+    <a href="/components/component_props_type.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Props 型別與驗證
+    </a>
+  
+    <a href="/components/component_emits.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Emit 傳遞事件
+    </a>
+  
+    <a href="/components/component_emits_api.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      Emits 驗證
+    </a>
+  
+    <a href="/components/component_slot.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      元件插巢
+    </a>
+  
+    <a href="/components/component_slot_props.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      元件插巢 Props
+    </a>
+  
+    <a href="/components/component_mitt.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      跨元件溝通
+    </a>
+  
+    <a href="/components/component_final.html"
+      class="list-group-item list-group-item-action
+        
+        ">
+      元件章節作業
+    </a>
+  
+  </div>
+  <div class="mt-3 text-end p-2 bg-light rounded">
+    <small class="text-black-50 fw-light mb-0">文件版本：2022/11/1</small>
+  </div>
+</div>
+
+</aside>
+    
+  </div>
+</div>
+
+<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-secondary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Vue 3 練習手冊</a>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link " href="/es6/shorthand.html">JS 必備觀念</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/intro/createApp.html">認識 Vue.js</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/template/v-text.html">模板</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/optionsApi/options-methods.html">方法</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/components/component_register.html">元件</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/advApi/adv-refs.html">進階</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/router/vue-router.html">路由</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/composition/proxy.html">Composition API</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="/pinia/layout.html">Pinia</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<footer class="footer py-2 bg-light">
+  <div class="container text-center">
+    <small class="text-black-50 fw-light mb-0">六角學院 Vue 課程專屬文件</small>
+  </div>
+</footer>
+<link rel="stylesheet" href="/stylesheets/all.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</body>
+</html>

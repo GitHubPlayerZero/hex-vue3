@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Create APP Test</title>
+</head>
+
+<body>
+	
+	<h1>Create APP Test</h1>
+	
+	<div id="test1">
+		{{ counter }}
+		{{ text }}
+	</div>
+	
+	
+	
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	
+	<script>
+		
+		const app = Vue.createApp({
+			data() {
+				return {
+					counter: 5,
+					text: `這是一段話`,
+				}
+			}
+		}).mount("#test1");
+		
+	</script>
+	
+</body>
+
+</html>

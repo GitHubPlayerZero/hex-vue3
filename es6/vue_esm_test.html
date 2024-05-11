@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Vue ESM Test</title>
+</head>
+
+<body>
+	
+	<h1>Vue ESM Test</h1>
+	
+	<div id="app1">APP 1：{{ counter }}</div>
+	<div id="app2">APP 2：{{ counter }}</div>
+	
+	
+	
+	<script>
+		
+		const Counter = {
+			data() {
+				return {
+					counter: 3
+				}
+			}
+		};
+		console.log(`Counter ==>`, Counter);
+		
+		// console.log(Array(99).fill(`🌹`).join(''));
+		
+	</script>
+	
+	
+	<script type="module">
+		
+		console.log(`========== 測試 1：使用 Vue 元件 ==========`);
+		
+		// Error: The requested module 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.esm-browser.min.js' does not provide an export named 'Vue'
+		// import {Vue} from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.esm-browser.min.js';
+		
+		// 要這樣才能直接使用 Vue 元件
+		import * as Vue from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.esm-browser.min.js';
+		console.log(`Vue ==>`, Vue);
+		
+		Vue.createApp(Counter).mount('#app1');
+		
+		console.log(``);
+		console.log(``);
+		
+	</script>
+	
+	
+	<script type="module">
+		
+		console.log(`========== 測試 2：直接使用 createApp 方法 ==========`);
+		
+		// 會造成直接使用 createApp 出錯：createApp is not defined
+		// import {} from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.esm-browser.min.js';
+		// import * as Vue from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.esm-browser.min.js';
+		
+		// 要解構才能使用
+		import {createApp} from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.13/vue.esm-browser.min.js';
+		console.log(`createApp ==>`, createApp);
+		
+		createApp(Counter).mount('#app2');
+		
+	</script>
+	
+</body>
+
+</html>
