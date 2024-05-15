@@ -94,6 +94,11 @@
 		</tbody>
 	</table>
 	
+	<hr>
+	
+	<h2>個人實驗：將樣板定義抽出成 function</h2>
+	<func-template></func-template>
+	
 </div>
 
 
@@ -114,6 +119,13 @@ const app = Vue.createApp({
 			templateName: 'template1'
 		};
 	},
+	
+	// 測試抽出 template 內容，但 template 似乎無法呼叫 methods...
+	methods: {
+		createTemplate2() {
+			return `<div class="alert alert-primary" role="alert">呼叫 function 建立的樣板</div>`;
+		}
+	}
 });
 
 
@@ -137,6 +149,21 @@ app.component('table-row', {
 	<td class="border-2">$</td>
 	<td class="border-2">這是一個 tr 項目</td>
 </tr>`
+});
+
+
+/* 將樣板定義抽出成 function */
+function createTemplate() {
+	return `<div class="alert alert-primary" role="alert">
+呼叫 function 建立的樣板
+</div>`;
+}
+
+app.component("funcTemplate", {
+	// template 呼叫 methods 定義的 function 會發生錯誤：this.createTemplate2 is not a function
+	// template: this.createTemplate2()
+	
+	template: createTemplate()
 });
 
 app.mount('#app');

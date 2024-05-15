@@ -3,18 +3,86 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">屬性綁定</h1><small>檔名：<code>v-bind.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+
 <div id="app">
-	<h3>綁定屬性 v-bind</h3>
+	
+	<!-- 基本綁定測試 -->
+	<h2>基本綁定測試</h2>
+	
+	<p class="title mt-4">綁定資料</p>
+	
+	<div class="mb-2">
+		str：<input type="text" v-bind:value="str">
+	</div>
+	
+	<div class="mb-2">
+		num：<input type="text" v-bind:value="num">
+	</div>
+	
+	<div class="mb-2">
+		boo：<input type="text" v-bind:value="boo">
+	</div>
+	
+	<div class="mb-2">
+		fun：<input type="text" v-bind:value="fun">
+	</div>
+	
+	<p class="title mt-5">綁定固定值</p>
+	
+	<div class="mb-2">
+		123：<input type="text" v-bind:value="123">
+	</div>
+	
+	<div class="mb-2">
+		true：<input type="text" v-bind:value="true">
+	</div>
+	
+	<div class="mb-2">
+		false：<input type="text" v-bind:value="false">
+	</div>
+	
+	<p class="mt-4">字串注意：必須用單引號或反引號包起來，才會被識別為字串，否則會被當成要綁定資料，而發生找不到的錯誤。</p>
+	
+	<!-- [Vue warn]: Property "abc" was accessed during render but is not defined on instance. -->
+	<div class="mb-2">
+		abc (沒有做處理)：<input type="text" v-bind:value="abc">
+	</div>
+	
+	<div class="mb-2">
+		abc (用單引號包起來)：<input type="text" v-bind:value="'abc'">
+	</div>
+	<div class="mb-2">
+		abc (用反引號包起來)：<input type="text" v-bind:value="`abc`">
+	</div>
+	
+	<p class="title mt-5">綁定和資料同名的固定值</p>
+	<p>當使用到和資料同名稱的值時，必須用單引號或反引號包起來，才會被識別為固定值，否則會被當成資料。</p>
+	
+	<div class="mb-2">
+		str (沒有做處理)：<input type="text" v-bind:value="str">
+	</div>
+	<div class="mb-2">
+		str (用單引號包起來)：<input type="text" v-bind:value="'str'">
+	</div>
+	<div class="mb-2">
+		str (用反引號包起來)：<input type="text" v-bind:value="`str`">
+	</div>
+	
+	<hr>
+	
+	<!-- 綁定屬性 v-bind -->
+	<h2>綁定屬性 v-bind</h2>
 	<p>{{ breakfastShop.name }}</p>
 	<img v-bind:src="breakfastShop.imgUrl"
 		class="square-img" v-bind:title="breakfastShop.name" v-bind:alt="breakfastShop.name">
 
-	<h3>縮寫形式 <code>:</code></h3>
+	<h2>縮寫形式 <code>:</code></h2>
 	<img :src="breakfastShop.imgUrl"
 		class="square-img" :title="breakfastShop.name" :alt="breakfastShop.name">
 
 	<hr>
-	<h3>更多屬性綁定</h3>
+	
+	<h2>更多屬性綁定</h2>
 	小明還想點餐：
 	<form action="">
 		<input type="text" value="我要吃蘿蔔糕">
@@ -27,7 +95,8 @@
 	isFull：{{ isFull }}
 
 	<hr>
-	<h3>搭配 v-for</h3>
+	
+	<h2>搭配 v-for</h2>
 	<table class="table">
 		<tbody>
 			<tr v-for="item in products" :key="item.imgUrl">
@@ -53,7 +122,8 @@
 	</table>
 
 	<hr>
-	<h3>表達式運用（串接）</h3>
+	
+	<h2>表達式運用（串接）</h2>
 	<p>{{ imageSize }}</p>
 	<input type="range" min="100" max="1000" v-model="imageSize">
 	<br>
@@ -63,13 +133,27 @@
 	
 	<hr>
 	
-	<h3>動態屬性綁定(注意大小寫)</h3>
+	
+	<h2>動態屬性綁定 (注意大小寫)</h2>
 	<button type="button" v-on:click="dynamic = dynamic === 'disabled' ? 'readonly':'disabled'">現在是 {{ dynamic
 		}}</button>&nbsp;&nbsp;
-	<input type="text" :[dynamic] :value="name">
+	
+	<!--
+		注意！使用 :[dynamic] 寫法可能會發生警告：
+		[Vue warn]: Template compilation error: v-bind is missing expression.
+		
+		原因是，vue 認為完整的語法應為 :屬性="值"
+		而這種寫法最後會被編譯為 :[dynamic]=""
+		可能是因為沒有值所以出現了警告。
+		
+		調整：改寫為 :[dynamic]="dynamic" 即可避免出現警告。
+	-->
+	<!-- <input type="text" :[dynamic] :value="name"> -->
+	<input type="text" :[dynamic]="dynamic" :value="name">
 
 	<hr>
-	<h3>預告：元件的資料傳遞亦是使用 v-bind</h3>
+	
+	<h2>預告：元件的資料傳遞亦是使用 v-bind</h2>
 	<ul>
 		<list-item :item="item" v-for="(item, key) in products" :key="item.name + 2"></list-item>
 	</ul>
@@ -81,6 +165,14 @@
 const App = {
 	data() {
 		return {
+			// 基本綁定測試
+			str: "我是字串",
+			num: 99,
+			boo: true,
+			fun () {
+				console.log(`我是 function`);
+			},
+			
 			name: '小明',
 			isFull: false,
 			link: '小明',
