@@ -3,89 +3,531 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Props 型別與驗證</h1><small>檔名：<code>component_props_type.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+
 <div id="app">
-  <h3>Props 型別技巧</h3>
-  <input type="number" v-model="money">
+	
+	<!-- Props 型別測試 -->
+	<h2>Props 型別測試</h2>
+	<p class="mb-4">
+		由以下測試可以發現，使用 v-bind 綁定的方式，會使用其傳入的資料的型別。<br>
+		若是直接寫死 HTML 屬性，無論傳入什麼都為 string。
+	</p>
+	
+	<!-- <input type="number" v-model="money"> -->
+	
+	<h3>使用 v-bind 綁定屬性</h3>
+	
+	<div class="mb-5">
+		<div class="box">
+			money：{{ money }}
+			<props-type :test="money"></props-type>
+		</div>
+		
+		<div class="box">
+			boo：{{ boo }}
+			<props-type :test="boo"></props-type>
+		</div>
+		
+		<div class="box">
+			big：{{ big }}
+			<props-type :test="big"></props-type>
+		</div>
+		
+		<div class="box">
+			fun：{{ fun }}
+			<props-type :test="fun"></props-type>
+		</div>
+		
+		<div class="box">
+			傳入 123：
+			<props-type :test="123"></props-type>
+		</div>
+		
+		<div class="box">
+			傳入 '123'：
+			<props-type :test="'123'"></props-type>
+		</div>
+		
+		<div class="box">
+			傳入 false：
+			<props-type :test="false"></props-type>
+		</div>
+		
+		<div class="box">
+			傳入 'abc'：
+			<props-type :test="'abc'"></props-type>
+		</div>
+		
+		<div class="box">
+			傳入 {}：
+			<props-type :test="{}"></props-type>
+		</div>
+	</div>
+	
+	<h3>直接使用 HTML 屬性</h3>
+	
+	<div>
+		<div class="box">
+			傳入 300：
+			<props-type test="300"></props-type>
+		</div>
+		
+		<div class="box">
+			傳入 true：
+			<props-type test="true"></props-type>
+		</div>
+		
+		<div class="box">
+			傳入 100n：
+			<props-type test="100n"></props-type>
+		</div>
+		
+		<div class="box">
+			傳入 function：
+			<props-type test="() => { return 'a' }"></props-type>
+		</div>
+		
+		<div class="box">
+			傳入 {}：
+			<props-type test="{}"></props-type>
+		</div>
+	</div>
+	
+	<hr>
 
-  <props-type money="300"></props-type>
-  <props-type :money="money"></props-type>
+	<!-- 定義 Props 驗證 -->
+	<h2>定義 Props 驗證</h2>
+	
+	<p class="mb-1">實戰中不太會用到全部技巧，常用的有：</p>
+	<ul>
+		<li>型別驗證</li>
+		<li>預設值、是否必填</li>
+	</ul>
+	
+	<p class="mb-4">當要寫驗證時，props 的格式要改用物件寫法。</p>
+	
+	<!-- 測試各種型別驗證 -->
+	<h3>測試各種型別驗證</h3>
+	<p>當參數為非必填時，沒傳入資料、或傳入 null、undefined 則不會進行驗證。</p>
+	
+	<p class="mb-1">註：</p>
+	<ul>
+		<li>null 的型別為 Object。</li>
+		<li>不傳入資料時會被當作 undefined，但 Boolean 除外，Boolean 會預設為 false（即使沒有設定預設值）。</li>
+	</ul>
+	
+	<props-validation1 
+		:prop-a="fun" 
+		:prop-b="str" 
+		:prop-c="money" 
+		:prop-d="boo" 
+		:prop-e="obj" 
+		:prop-f="fun" 
+		:prop-g="money"
+		:prop-h="undefined" 
+		:prop-i="null">
+	</props-validation1>
 
-
-  <h3>定義 Props 型別驗證</h3>
-  <p>實戰中不太會用到全部技巧，常用的有：</p>
-  <ul>
-    <li>型別驗證</li>
-    <li>預設值、是否必填</li>
-  </ul>
-  <props-validation
-  :prop-a="fun"
-  prop-c="required"
-  :prop-f="10000"
-  >
-  </props-validation>
+	
+	<!-- 單一參數允許多種型別 -->
+	<h3 class="mt-4">單一參數允許多種型別</h3>
+	<props-validation2 
+		:prop-a="str" 
+		:prop-b="money" 
+		:prop-c="fun">
+	</props-validation2>
+	
+	
+	<!-- 必填 -->
+	<h3 class="mt-4">必填</h3>
+	<p>當參數為必填時，即使傳入的是 null、undefined，都會檢查其型別是否符合，不會跳過型別驗證。</p>
+	
+	<props-validation3 
+		:prop-b="null" 
+		:prop-c="undefined" 
+		:prop-d="str" 
+		:prop-e="money" >
+	</props-validation3>
+	
+	
+	<!-- 預設值 -->
+	<h3 class="mt-4">預設值</h3>
+	<p>由測試可知，null 會被當成「有值」，因此不會帶預設值。</p>
+	
+	<props-validation4 
+		:prop-num2="undefined"
+		:prop-num3="null"
+		:prop-boo3="undefined"
+		:prop-boo4="null"
+		:prop-str2="undefined"
+		:prop-str3="null"
+		:prop-obj2="undefined"
+		:prop-obj3="null"
+		:prop-func2="undefined"
+		:prop-func3="null"
+		:prop-mix2="undefined"
+		:prop-mix3="null"
+		:prop-mix4="null"
+		:prop-mix5="str"
+		:prop-mix6="boo" >
+	</props-validation4>
+	
+	
+	<h3 class="mt-4">自訂預設值函式、自訂驗證</h3>
+	
+	<props-validation5
+		:prop-b="money"
+		:prop-b2="1001"
+		:prop-c="9" >
+	</props-validation5>
+	
 </div>
 
-<script type="module">
-  // 區域註冊
-  const app = Vue.createApp({
-    data() {
-      return {
-        money: 300,
-        big: 100n,
-        boo: true,
-        fun: () => { return 'a' }
-      };
-    },
-  });
+<br><br>
 
-  app.component('props-type', {
-    props: ['money'],
-    template: `<div>value: {{money}}, typeof:{{ typeof money }}</div>`
-  });
+<script>
 
-  app.component('props-validation', {
-    props: {
-      // 單一型別檢查，可接受的型別 String, Number, Object, Boolean, Function(在 Vue 中可使用 Function 驗證型別)
-      // null, undefined 會直接通過驗證
-      propA: Function,
+function checkNullUndefined (val) {
+	return val === null ? "Null" : 
+				val === undefined ? "Undefined" : "";
+}
 
-      // 多個型別檢查
-      propB: [String, Number],
 
-      // 必要值
-      propC: {
-        type: String,
-        required: true,
-      },
+const app = Vue.createApp({
+	data() {
+		return {
+			money: 300,
+			big: 100n,
+			boo: true,
+			str: "abc",
+			obj: { name: '小明' },
+			fun: () => { return 'a' }
+		};
+	},
+});
 
-      // 預設值
-      propD: {
-        type: Number,
-        default: 300
-      },
 
-      // 自訂函式
-      propE: {
-        type: Object,
-        default() {
-          return {
-            money: 300
-          }
-        }
-      },
+/* Props 型別測試 */
+app.component('props-type', {
+	props: ['test'],
+	template: `<div>value: {{test}}, typeof ==> {{ typeof test }}</div>`
+});
 
-      // 自訂驗證
-      propF: {
-        validator(value) {
-          return value > 1000
-        }
-      },
-    },
-    template: `{{propA}},{{propC}},{{propD}}<br>{{propE}},{{propF}}`
-  })
 
-  app.mount('#app');
+/* 定義 Props 驗證 */
+// 測試各種型別驗證
+app.component('props-validation1', {
+	props: {
+		// 單一型別檢查，可接受的型別 String, Number, Object, Boolean, Function (在 Vue 中可使用 Function 驗證型別)
+		// null, undefined 會直接通過驗證
+		propA: Function,
+		propB: String,
+		propC: Number,
+		propD: Boolean,
+		propE: Object,
+		propF: null,
+		propG: undefined,
+		propH: String,
+		propI: String,
+		propJ: String,
+		propK: Boolean,
+	},
+	methods: {
+		checkNullUndefined
+	},
+	template: `<table class="border-table"><tr>`
+		+ `<th>參數</th>`
+		+ `<th>值</th>`
+		+ `<th>類型</th>`
+		+ `<th>備註</th>`
+		+ `</tr>`
+		+ `<tr><td>propA (Function)</td><td>{{ propA }} {{ checkNullUndefined(propA) }}</td><td>{{typeof propA}}</td><td></td></tr>`
+		+ `<tr><td>propB (String)</td><td>{{ propB }} {{ checkNullUndefined(propB) }}</td><td>{{typeof propB}}</td><td></td></tr>`
+		+ `<tr><td>propC (Number)</td><td>{{ propC }} {{ checkNullUndefined(propC) }}</td><td>{{typeof propC}}</td><td></td></tr>`
+		+ `<tr><td>propD (Boolean)</td><td>{{ propD }} {{ checkNullUndefined(propD) }}</td><td>{{typeof propD}}</td><td></td></tr>`
+		+ `<tr><td>propE (Object)</td><td>{{ propE }} {{ checkNullUndefined(propE) }}</td><td>{{typeof propE}}</td><td></td></tr>`
+		+ `<tr><td>propF (null)</td><td>{{ propF }} {{ checkNullUndefined(propF) }}</td><td>{{typeof propF}}</td><td></td></tr>`
+		+ `<tr><td>propG (undefined)</td><td>{{ propG }} {{ checkNullUndefined(propG) }}</td><td>{{typeof propG}}</td><td></td></tr>`
+		+ `<tr><td>propH (String)</td><td>{{ propH }} {{ checkNullUndefined(propH) }}</td><td>{{typeof propH}}</td><td>傳入 undefined</td></tr>`
+		+ `<tr><td>propI (String)</td><td>{{ propI }} {{ checkNullUndefined(propI) }}</td><td>{{typeof propI}}</td><td>傳入 null</td></tr>`
+		+ `<tr><td>propJ (String)</td><td>{{ propJ }} {{ checkNullUndefined(propJ) }}</td><td>{{typeof propJ}}</td><td>沒傳資料</td></tr>`
+		+ `<tr><td>propK (Boolean)</td><td>{{ propK }} {{ checkNullUndefined(propK) }}</td><td>{{typeof propK}}</td><td>沒傳資料</td></tr>`
+		+ `</table>`
+});
+
+// 單一參數允許多種型別
+app.component('props-validation2', {
+	props: {
+		propA: [String, Number],
+		propB: [String, Number],
+		propC: [String, Number],
+		propD: [String, Number],
+		propE: [String, Number, Boolean],
+	},
+	template: `<table class="border-table"><tr>`
+		+ `<th>參數</th>`
+		+ `<th>值</th>`
+		+ `<th>類型</th>`
+		+ `<th>備註</th>`
+		+ `</tr>`
+		+ `<tr><td>propA (String, Number)</td><td>{{ propA }}</td><td>{{typeof propA}}</td><td></td></tr>`
+		+ `<tr><td>propB (String, Number)</td><td>{{ propB }}</td><td>{{typeof propB}}</td><td></td></tr>`
+		+ `<tr><td>propC (String, Number)</td><td>{{ propC }}</td><td>{{typeof propC}}</td><td>發生驗證錯誤警告</td></tr>`
+		+ `<tr><td>propD (String, Number)</td><td>{{ propD }}</td><td>{{typeof propD}}</td><td>沒傳資料</td></tr>`
+		+ `<tr><td>propE (String, Number, Boolean)</td><td>{{ propE }}</td><td>{{typeof propE}}</td><td>沒傳資料</td></tr>`
+		+ `</table>`
+});
+
+
+// 必填
+app.component('props-validation3', {
+	props: {
+		propA: {
+			type: String,
+			required: true,
+		},
+		propB: {
+			type: Number,
+			required: true,
+		},
+		propC: {
+			type: Object,
+			required: true,
+		},
+		propD: {
+			type: Function,
+			required: true,
+		},
+		propE: {
+			type: Number,
+			required: true,
+		},
+		propF: {
+			type: Boolean,
+			required: true,
+		},
+	},
+	methods: {
+		checkNullUndefined
+	},
+	template: `<table class="border-table"><tr>`
+		+ `<th>參數</th>`
+		+ `<th>值</th>`
+		+ `<th>類型</th>`
+		+ `<th>備註</th>`
+		+ `</tr>`
+		+ `<tr><td>propA (String)</td><td>{{ propA }} {{ checkNullUndefined(propA) }}</td><td>{{typeof propA}}</td><td>沒傳資料<br>發生驗證錯誤警告</td></tr>`
+		+ `<tr><td>propB (Number)</td><td>{{ propB }} {{ checkNullUndefined(propB) }}</td><td>{{typeof propB}}</td><td>傳入 null<br>發生驗證錯誤警告</td></tr>`
+		+ `<tr><td>propC (Object)</td><td>{{ propC }} {{ checkNullUndefined(propC) }}</td><td>{{typeof propC}}</td><td>傳入 undefined<br>發生驗證錯誤警告</td></tr>`
+		+ `<tr><td>propD (Function)</td><td>{{ propD }} {{ checkNullUndefined(propD) }}</td><td>{{typeof propD}}</td><td>型別錯誤<br>發生驗證錯誤警告</td></tr>`
+		+ `<tr><td>propE (Number)</td><td>{{ propE }} {{ checkNullUndefined(propE) }}</td><td>{{typeof propE}}</td><td></td></tr>`
+		+ `<tr><td>propF (Boolean)</td><td>{{ propF }} {{ checkNullUndefined(propF) }}</td><td>{{typeof propF}}</td><td>沒傳資料<br>發生驗證錯誤警告<br>但仍會預設帶入 false</td></tr>`
+		+ `</table>`
+});
+
+// 預設值
+function testFunc() {
+	console.log(`This is test function!`);
+}
+
+app.component('props-validation4', {
+	props: {
+		propNum: {
+			type: Number,
+			default: 50
+		},
+		propNum2: {
+			type: Number,
+			default: 50
+		},
+		propNum3: {
+			type: Number,
+			default: 50,
+		},
+		propBoo: Boolean,
+		propBoo2: {
+			type: Boolean,
+			default: true
+		},
+		propBoo3: {
+			type: Boolean,
+			default: true
+		},
+		propBoo4: {
+			type: Boolean,
+			default: true
+		},
+		propStr: {
+			type: String,
+			default: "Default!"
+		},
+		propStr2: {
+			type: String,
+			default: "Default!"
+		},
+		propStr3: {
+			type: String,
+			default: "Default!"
+		},
+		propObj: {
+			type: Object,
+			default: { name: '小王' }
+		},
+		propObj2: {
+			type: Object,
+			default: { name: '小王' }
+		},
+		propObj3: {
+			type: Object,
+			default: { name: '小王' }
+		},
+		propFunc: {
+			type: Function,
+			default: testFunc
+		},
+		propFunc2: {
+			type: Function,
+			default: testFunc
+		},
+		propFunc3: {
+			type: Function,
+			default: testFunc
+		},
+		
+		// 沒傳入資料，會帶預設值，會跳警告
+		// [Vue warn]: Missing required prop: "propMix" 
+		propMix: {
+			type: Boolean,
+			default: true,
+			required: true,
+		},
+		// 傳入 undefined，會帶預設值，不會跳警告
+		propMix2: {
+			type: Boolean,
+			default: true,
+			required: true,
+		},
+		// 傳入 null，不會帶預設值，會跳警告
+		// [Vue warn]: Invalid prop: type check failed for prop "propMix3". Expected Boolean, got Null 
+		propMix3: {
+			type: Boolean,
+			default: true,
+			required: true,
+		},
+		// 傳入 null，不會帶預設值，會跳警告
+		// [Vue warn]: Invalid prop: type check failed for prop "propMix4". Expected Boolean | Object, got Null 
+		propMix4: {
+			type: [Boolean, Object],
+			default: {},
+			required: true,
+		},
+		// 傳入字串，不會帶預設值，會跳警告
+		// [Vue warn]: Invalid prop: type check failed for prop "propMix5". Expected Boolean | Object, got String with value "abc".
+		propMix5: {
+			type: [Boolean, Object],
+			default: {},
+		},
+		// 傳入布林，不會帶預設值
+		propMix6: {
+			type: [Boolean, Object],
+			default: {},
+			required: true
+		},
+	},
+	methods: {
+		checkNullUndefined
+	},
+	template: `<table class="border-table"><tr>`
+		+ `<th>參數</th>`
+		+ `<th>預設</th>`
+		+ `<th>值</th>`
+		+ `<th>類型</th>`
+		+ `<th>備註</th>`
+		+ `</tr>`
+		+ `<tr><td>propNum (Number)</td><td>50</td><td>{{ propNum }} {{ checkNullUndefined(propNum) }}</td><td>{{typeof propNum}}</td><td>沒傳資料</td></tr>`
+		+ `<tr><td>propNum2 (Number)</td><td>50</td><td>{{ propNum2 }} {{ checkNullUndefined(propNum2) }}</td><td>{{typeof propNum2}}</td><td>傳入 undefined</td></tr>`
+		+ `<tr><td>propNum3 (Number)</td><td>50</td><td>{{ propNum3 }} {{ checkNullUndefined(propNum3) }}</td><td>{{typeof propNum3}}</td><td>傳入 null</td></tr>`
+		+ `<tr><td>propBoo (Boolean)</td><td>無</td><td>{{ propBoo }} {{ checkNullUndefined(propBoo) }}</td><td>{{typeof propBoo}}</td><td>沒傳資料</td></tr>`
+		+ `<tr><td>propBoo2 (Boolean)</td><td>true</td><td>{{ propBoo2 }} {{ checkNullUndefined(propBoo2) }}</td><td>{{typeof propBoo2}}</td><td>沒傳資料</td></tr>`
+		+ `<tr><td>propBoo3 (Boolean)</td><td>true</td><td>{{ propBoo3 }} {{ checkNullUndefined(propBoo3) }}</td><td>{{typeof propBoo3}}</td><td>傳入 undefined</td></tr>`
+		+ `<tr><td>propBoo4 (Boolean)</td><td>true</td><td>{{ propBoo4 }} {{ checkNullUndefined(propBoo4) }}</td><td>{{typeof propBoo4}}</td><td>傳入 null</td></tr>`
+		+ `<tr><td>propStr (String)</td><td>"Default!"</td><td>{{ propStr }} {{ checkNullUndefined(propStr) }}</td><td>{{typeof propStr}}</td><td>沒傳資料</td></tr>`
+		+ `<tr><td>propStr2 (String)</td><td>"Default!"</td><td>{{ propStr2 }} {{ checkNullUndefined(propStr2) }}</td><td>{{typeof propStr2}}</td><td>傳入 undefined</td></tr>`
+		+ `<tr><td>propStr3 (String)</td><td>"Default!"</td><td>{{ propStr3 }} {{ checkNullUndefined(propStr3) }}</td><td>{{typeof propStr3}}</td><td>傳入 null</td></tr>`
+		+ `<tr><td>propObj (Object)</td><td>{ name: '小王' }</td><td>{{ propObj }} {{ checkNullUndefined(propObj) }}</td><td>{{typeof propObj}}</td><td>沒傳資料</td></tr>`
+		+ `<tr><td>propObj2 (Object)</td><td>{ name: '小王' }</td><td>{{ propObj2 }} {{ checkNullUndefined(propObj2) }}</td><td>{{typeof propObj2}}</td><td>傳入 undefined</td></tr>`
+		+ `<tr><td>propObj3 (Object)</td><td>{ name: '小王' }</td><td>{{ propObj3 }} {{ checkNullUndefined(propObj3) }}</td><td>{{typeof propObj3}}</td><td>傳入 null</td></tr>`
+		+ `<tr><td>propFunc (Function)</td><td>testFunc</td><td>{{ propFunc }} {{ checkNullUndefined(propFunc) }}</td><td>{{typeof propFunc}}</td><td>沒傳資料</td></tr>`
+		+ `<tr><td>propFunc2 (Function)</td><td>testFunc</td><td>{{ propFunc2 }} {{ checkNullUndefined(propFunc2) }}</td><td>{{typeof propFunc2}}</td><td>傳入 undefined</td></tr>`
+		+ `<tr><td>propFunc3 (Function)</td><td>testFunc</td><td>{{ propFunc3 }} {{ checkNullUndefined(propFunc3) }}</td><td>{{typeof propFunc3}}</td><td>傳入 null</td></tr>`
+		+ `<tr><td>propMix (Boolean, 必填)</td><td>true</td><td>{{ propMix }} {{ checkNullUndefined(propMix) }}</td><td>{{typeof propMix}}</td><td>沒傳資料<br>發生驗證錯誤警告</td></tr>`
+		+ `<tr><td>propMix2 (Boolean, 必填)</td><td>true</td><td>{{ propMix2 }} {{ checkNullUndefined(propMix2) }}</td><td>{{typeof propMix2}}</td><td>傳入 undefined</td></tr>`
+		+ `<tr><td>propMix3 (Boolean, 必填)</td><td>true</td><td>{{ propMix3 }} {{ checkNullUndefined(propMix3) }}</td><td>{{typeof propMix3}}</td><td>傳入 null<br>發生驗證錯誤警告</td></tr>`
+		+ `<tr><td>propMix4 (Boolean, Object, 必填)</td><td>{}</td><td>{{ propMix4 }} {{ checkNullUndefined(propMix4) }}</td><td>{{typeof propMix4}}</td><td>傳入 null<br>發生驗證錯誤警告</td></tr>`
+		+ `<tr><td>propMix5 (Boolean, Object, 必填)</td><td>{}</td><td>{{ propMix5 }} {{ checkNullUndefined(propMix5) }}</td><td>{{typeof propMix5}}</td><td>發生驗證錯誤警告</td></tr>`
+		+ `<tr><td>propMix6 (Boolean, Object, 必填)</td><td>{}</td><td>{{ propMix6 }} {{ checkNullUndefined(propMix6) }}</td><td>{{typeof propMix6}}</td><td></td></tr>`
+		+ `</table>`
+});
+
+
+// 自訂預設值函式、自訂驗證
+app.component('props-validation5', {
+	props: {
+		propA: {
+			type: Object,
+			
+			// 預設值
+			default () {
+				return {
+					age: 20
+				};
+			}
+		},
+		
+		// 檢查值必須大於 1000
+		propB: {
+			validator (value) {
+				return value > 1000;
+			}
+		},
+		propB2: {
+			validator (value) {
+				return value > 1000;
+			}
+		},
+		
+		propC: {
+			type: Number,
+			required: true,
+			
+			validator (val) {
+				console.log(`[propC] ==> ${val}`);
+				const result = val >= 10 && val <= 50;
+				if (!result) {
+					console.log(`值必須大於等於 10 並且小於等於 50！`);
+				}
+				return result;
+			},
+		},
+	},
+	template: `<table class="border-table"><tr>`
+		+ `<th>參數</th>`
+		+ `<th>值</th>`
+		+ `<th>類型</th>`
+		+ `<th>備註</th>`
+		+ `</tr>`
+		+ `<tr><td>propA</td><td>{{ propA }}</td><td>{{typeof propA}}</td><td>沒傳資料<br>自訂義預設值函式</td></tr>`
+		+ `<tr><td>propB</td><td>{{ propB }}</td><td>{{typeof propB}}</td><td>檢查值必須大於 1000<br>發生驗證錯誤警告</td></tr>`
+		+ `<tr><td>propB2</td><td>{{ propB2 }}</td><td>{{typeof propB2}}</td><td>檢查值必須大於 1000</td></tr>`
+		+ `<tr><td>propC</td><td>{{ propC }}</td><td>{{typeof propC}}</td><td>發生驗證錯誤警告</td></tr>`
+		+ `</table>`
+});
+
+app.mount('#app');
+  
 </script>
+
+
 
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>

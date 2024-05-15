@@ -3,49 +3,93 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Props</h1><small>檔名：<code>component_props.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+
 <div id="app">
-  <h3>Props 靜態資料</h3>
-  <p>由外部傳入資料至內部</p>
-  外部資源：https://images.unsplash.com/photo-1605784401368-5af1d9d6c4dc?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80
-  <photo></photo>
-
-  <h3>動態資源</h3>
-  <p>技巧：前內、後外</p>
-  <photo></photo>
-
-  <h3>單向數據流</h3>
-  <photo2 :url="imgUrl"></photo2>
-
-  <h3>命名限制</h3>
-  <photo3></photo3>
+	
+	<!-- Props 靜態資料 -->
+	<h2>Props 靜態資料</h2>
+	<p>由外部傳入資料至內部，傳給子元件的資料是寫死的。</p>
+	<p>
+		外部資源：https://images.unsplash.com/photo-1605784401368-5af1d9d6c4dc?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80
+	</p>
+	
+	<!-- url 為子元件 props 所定義的參數名稱 -->
+	<photo url="https://images.unsplash.com/photo-1605784401368-5af1d9d6c4dc?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"></photo>
+	
+	<hr>
+	
+	<!-- 動態資源 -->
+	<h2>動態資源</h2>
+	<p>傳入給子元件的資料不是寫死的，而是使用 Vue 資料物件所定義好的屬性，因此會使用 v-bind 的方式。</p>
+	<p>技巧：前內、後外</p>
+	
+	<photo v-bind:url="imgUrl"></photo>
+	
+	<hr>
+	
+	<!-- 單向數據流 -->
+	<h2>單向數據流</h2>
+	<p>子元件不能修改父元件傳入的資料。</p>
+	
+	<photo2 :url="imgUrl"></photo2>
+	
+	<hr>
+	
+	<!-- 命名限制 -->
+	<h2>命名限制</h2>
+	<p>元件名稱若為小駝峰寫法，HTML 屬性要用 "-" 寫法。</p>
+	
+	<!-- 此屬性名稱無法正確傳遞資料 -->
+	<!-- <photo3 :superUrl="imgUrl"></photo3> -->
+	<!-- 編譯出來的結果：可以看到 superUrl 被轉為 "superurl"
+	<img class="img-thumbnail" alt="" superurl="https://images.unsplash.com/photo-1605784401368-5af1d9d6c4dc?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&amp;ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=600&amp;q=80"> -->
+	
+	<photo3 :super-url="imgUrl"></photo3>
+	
 </div>
 
-<script type="module">
-  // 區域註冊
-  const app = Vue.createApp({
-    data() {
-      return {
-        imgUrl: 'https://images.unsplash.com/photo-1605784401368-5af1d9d6c4dc?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
-      };
-    },
-  });
 
-  app.component('photo', {
-    template: `<img :src="url" class="img-thumbnail" alt>`
-  });
+<script>
 
-  app.component('photo2', {
-    props: ['url'],
-    template: `<img :src="url" class="img-thumbnail" alt><br>
-    <input type="text" v-model="url"> {{ url }}`
-  })
+const app = Vue.createApp({
+	data() {
+		return {
+			imgUrl: 'https://images.unsplash.com/photo-1605784401368-5af1d9d6c4dc?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
+		};
+	},
+});
 
-  app.component('photo3', {
-    props: ['superUrl'],
-    template: `<img :src="superUrl" class="img-thumbnail" alt>`
-  })
-  app.mount('#app');
+/* Props 靜態資料 */
+app.component('photo', {
+	props: ["url"],
+	
+	// 注意，v-bind 綁定的 src 屬性值，其名稱要與 props 所定義的參數名稱相同
+	template: `<img :src="url" class="img-thumbnail" alt>`
+});
+
+
+/*
+	單向數據流
+	無法修改，並且會出現警告：
+	[Vue warn]: Attempting to mutate prop "url". Props are readonly. 
+*/
+app.component('photo2', {
+	props: ['url'],
+	template: `<img :src="url" class="img-thumbnail" alt><br>
+<input type="text" size="60" v-model="url"><br>{{ url }}`
+})
+
+
+/* 命名限制 */
+app.component('photo3', {
+	props: ['superUrl'],
+	template: `<img :src="superUrl" class="img-thumbnail" alt>`
+})
+app.mount('#app');
+
 </script>
+
+
 
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
