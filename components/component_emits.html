@@ -3,84 +3,418 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Emit 傳遞事件</h1><small>檔名：<code>component_emits.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+<p class="mb-2">額外參考：</p>
+<ul>
+	<li><a href="https://blog.csdn.net/saltlike/article/details/120728843" target="_blank">vue 中 $emit 传递多个参数</a></li>
+	<li><a href="https://www.cnblogs.com/linzhifen5/p/17240872.html" target="_blank">vue 中 $emit传递多个参數，arguments、$event 的使用</a></li>
+</ul>
+
+<hr>
+
 <div id="app">
-  <h3>Emit 處發外部事件</h3>
-  <ul>
-    <li>先定義外層接收的方法</li>
-    <li>定義內層的 $emit 觸發方法</li>
-    <li>使用 v-on 的方式觸發外層方法（口訣：前內、後外）</li>
-  </ul>
-  {{ num }}
-  <button-counter
-
-  ></button-counter>
-
-  <h3>傳遞資料狀態</h3>
-  內部傳來的文字：{{ text }}<br>
-  <button-text
-
-  ></button-text>
-
-  <h3>命名注意</h3>
-  <p>駝峰的大寫文字，可以改為 `-` 進行串接</p>
-  內部傳來的文字：{{ text }}<br>
-  <button-named
-    @emit-text="getData"
-  ></button-named>
+	
+	<div class="box">
+		<p class="mb-2">撰寫流程參考：</p>
+		<ol>
+			<li>先定義外層接收的方法</li>
+			<li>定義內層的 $emit 觸發方法</li>
+			<li>使用 v-on 的方式觸發外層方法（口訣：前內、後外）</li>
+		</ol>
+	</div>
+	
+	<hr>
+	
+	<!-- 子元件觸發父元件方法 -->
+	<h2>子元件觸發父元件方法</h2>
+	<div class="mb-3">累加器：{{ num }}</div>
+	<button-counter 
+			@emit-add="addNum" 
+			@emit-add2="addNum">
+	</button-counter>
+	
+	<hr>
+	
+	<!-- 命名注意 -->
+	<h2>命名注意</h2>
+	<p>定義 emit 事件的名稱時，可以使用駝峰寫法，但在 HTML 中需使用 "-" 進行串接。</p>
+	
+	<div class="mb-3">累加器：{{ num }}</div>
+	
+	<div class="box">
+		<p class="title">錯誤</p>
+		<!--
+			若直接使用 emit 的原始名稱 (小駝峰) 會發生錯誤：
+			[Vue warn]: Event "emitadd" is emitted in component ButtonNamed but the handler is registered for "emitAdd". Note that HTML attributes are case-insensitive and you cannot use v-on to listen to camelCase events when using in-DOM templates. You should probably use "emit-add" instead of "emitAdd".
+		-->
+		<button-named @emitAdd="addNum"></button-named>
+	</div>
+	
+	<div class="box">
+		<p class="title">正確</p>
+		<!-- 要改用 "-" 串接 -->
+		<button-named @emit-add="addNum"></button-named>
+	</div>
+	
+	<hr>
+	
+	<h2>子元件傳遞資料</h2>
+	
+	<!-- 傳一個參數 -->
+	<h3>傳一個參數</h3>
+	
+	<div class="mb-2">內部傳來的文字：{{ text }}</div>
+	
+	<div class="flex-btn-group">
+		<single-param 
+			@emit-single-text="setSingleText"
+			@emit-single-text2="setSingleText" >
+		</single-param>
+	</div>
+	
+	
+	<!-- 傳多個參數 (逐一對應、arguments) -->
+	<h3 class="mt-5">傳多個參數 (逐一對應、arguments)</h3>
+	<p class="highlight">目前 arguments 的做法似乎無法使用，若不想逐一接收散裝的參數的話，替代方案是將多個參數封裝成物件傳入，或是父元件使用剩餘參數的方式接收參數。</p>
+	
+	<div class="mb-2">
+		內部傳來的文字：
+		<ul>
+			<li>{{ text }}</li>
+			<li>{{ text2 }}</li>
+			<li>{{ text3 }}</li>
+		</ul>
+	</div>
+	<multi-param 
+		@emit-multi-text="setMultiText" 
+		@emit-multi-text2="setMultiText2(arguments)" 
+		@emit-multi-text3="setMultiText3" 
+		@emit-multi-text4="setMultiText4" ></multi-param>
+	
+	
+	<!-- 父元件接收子元件及自己的參數 -->
+	<h3 class="mt-5">父元件接收子元件及自己的參數</h3>
+	<p class="highlight">arguments 一樣會失效 ...</p>
+	
+	<param-child-parent
+		@emit-param-test1="testParam1($event, text)" 
+		@emit-param-test1-1="testParam1($event, text)" 
+		@emit-param-test1-2="testParam1(text, $event)" 
+		@emit-param-test2="testParam2($event, text, text2)" 
+		@emit-param-test3="testParam3(arguments, text)" 
+		@emit-param-test3-1="testParam3($event, text)" 
+	></param-child-parent>
+	
 </div>
 
-<script type="module">
-  // 區域註冊
-  const app = Vue.createApp({
-    data() {
-      return {
-        num: 0,
-        text: ''
-      };
-    },
-    methods: {
-      // addNum() {
-      //   console.log('addNum');
-      //   this.num++
-      // },
-      // getData(text) {
-      //   console.log('getData', text);
-      //   this.text = text;
-      // }
-    }
-  });
-
-  app.component('button-counter', {
-    methods: {
-
-    },
-    template: `<button type="button">add</button>`
-  });
-
-  app.component('button-text', {
-    data() {
-      return {
-        text: '內部資料',
-      }
-    },
-    methods: {
-    },
-    template: `<button type="button">emit data</button>`
-  });
-
-  app.component('button-named', {
-    methods: {
-      emit() {
-        console.log('emit')
-        this.$emit('emitText', '內部文字');
-      }
-    },
-    template: `<button type="button" @click="emit">emit data</button>`
-  })
 
 
-  app.mount('#app');
+<script>
+
+const app = Vue.createApp({
+	data () {
+		return {
+			num: 0,
+			text: '外層元件資料',
+			text2: '外層元件資料 2',
+			text3: '外層元件資料 3',
+		};
+	},
+	
+	methods: {
+		addNum () {
+			console.log(`[Parent] addNum ...`);
+			this.num ++;
+		},
+		setSingleText (val) {
+			console.log(`[Parent] setSingleText ...`);
+			this.text = val;
+		},
+		
+		
+		/* 傳多個參數 */
+		// 逐一對應
+		setMultiText (val1, val2, val3) {
+			console.log(`[Parent] setMultiText ...`);
+			this.text = val1;
+			this.text2 = val2;
+			this.text3 = val3;
+		},
+		
+		// arguments
+		// 接收不到 arguments...
+		setMultiText2 (params) {
+			console.log(`[Parent] setMultiText2 ...`);
+			console.log(`參數 ==>`, params);
+			// this.text = params[0];
+			// this.text2 = params[1];
+			// this.text3 = params[2];
+		},
+		
+		// 將參數封裝成物件
+		setMultiText3 (obj) {
+			console.log(`[Parent] setMultiText3 ...`);
+			console.log(`參數 ==>`, obj);
+			this.text = obj.text;
+			this.text2 = obj.text2;
+			this.text3 = obj.text3;
+		},
+		
+		// 使用剩餘參數寫法
+		setMultiText4 (...params) {
+			console.log(`[Parent] setMultiText4 ...`);
+			console.log(`參數 ==>`, params);
+			this.text = params[0];
+			this.text2 = params[1];
+			this.text3 = params[2];
+		},
+		
+		
+		/* 父元件接收子元件及自己的參數 */
+		// 子元件一個參數，父元件一個參數
+		testParam1 (childParam, fatherParam) {
+			console.log(`[Parent - testParam1] ...`);
+			
+			console.log(`childParam ==>`, childParam);
+			
+			if (childParam instanceof HTMLElement) {
+				console.dir(childParam);
+				console.log(``);
+			}
+			
+			console.log(`fatherParam ==> ${fatherParam}`);
+		},
+		
+		// 子元件一個參數，父元件多個參數
+		testParam2 (childParam, fatherParam1, fatherParam2) {
+			console.log(`[Parent - testParam2] ......`);
+			console.log(`childParam ==>`, childParam);
+			console.log(`fatherParam1 ==>`, fatherParam1);
+			console.log(`fatherParam2 ==>`, fatherParam2);
+		},
+		
+		// 子元件多個參數，父元件一個參數
+		// arguments 一樣會失效 ...
+		testParam3 (childParam, fatherParam) {
+			console.log(`[Parent - testParam3] ......`);
+			console.log(`childParam ==>`, childParam);
+			console.log(`fatherParam ==>`, fatherParam);
+		},
+	}
+});
+
+
+/* 子元件觸發父元件方法 */
+app.component('button-counter', {
+	emits: ['emit-add', 'emit-add2'],
+	
+	methods: {
+		add () {
+			console.clear();
+			console.log(`[Child] add ...`);
+			this.$emit('emit-add');
+		}
+	},
+	template: `<button type="button" @click="add">Add (由子元件方法設定 emit)</button>&nbsp;&nbsp;`
+			+ `<button type="button" @click="$emit('emit-add2')">Add (樣板直接設定 emit)</button>`,
+});
+
+
+/* 命名注意 */
+app.component('button-named', {
+	methods: {
+		add () {
+			console.clear();
+			console.log(`[Child] add ...`);
+			this.$emit('emitAdd');
+		}
+	},
+	template: `<button type="button" @click="add">Add</button>`,
+});
+
+
+/* 傳一個參數 */
+app.component('single-param', {
+	
+	data () {
+		return {
+			text: '內層元件資料',
+			text2: '內層元件資料 2',
+		}
+	},
+	
+	emits: ['emit-single-text', 'emit-single-text2'],
+	
+	methods: {
+		changeSingleText () {
+			console.clear();
+			console.log(`[Child] changeSingleText ...`);
+			this.$emit('emit-single-text', this.text);
+		}
+	},
+	
+	template: `<button type="button" @click="changeSingleText">改變父元件文字 (由子元件方法設定 emit)</button>`
+			+ `<button type="button" @click="$emit('emit-single-text2', text2)">改變父元件文字 (樣板直接設定 emit)</button>`,
+});
+
+
+/* 傳多個參數 */
+app.component('multi-param', {
+	data () {
+		return {
+			text: '內層元件資料',
+		}
+	},
+	
+	/*
+		在設定多組 emit 後，如果沒有聲明 emits，會出現如下警告：
+		[Vue warn]: Extraneous non-emits event listeners (emitMultiText, emitMultiText2) were passed to component but could not be automatically inherited because component renders fragment or text root nodes. If the listener is intended to be a component custom event listener only, declare it using the "emits" option. 
+		
+		陣列裡的 emit 名稱可用駝峰命名，亦可用烤肉串命名。
+		但是最好和原本定義的 emit 名稱一致，若不一致，在點擊按鈕時會出現類似這樣的警告：
+		[Vue warn]: Component emitted event "emitMultiText" but it is neither declared in the emits option nor as an "onEmitMultiText" prop.
+	*/
+	emits: ["emit-multi-text", "emit-multi-text2", "emit-multi-text3", "emit-multi-text4"],
+	// emits: ["emitMultiText", "emitMultiText2", "emitMultiText3"],
+	
+	methods: {
+		// 逐一對應
+		changeMultiText () {
+			console.clear();
+			console.log(`[Child] changeMultiText ...`);
+			this.$emit('emit-multi-text', '子元件逐一對應參數 1', '子元件逐一對應參數 2', '子元件逐一對應參數 3');
+			// this.$emit('emitMultiText', '子元件逐一對應參數 1', '子元件逐一對應參數 2', '子元件逐一對應參數 3');
+		},
+		
+		// arguments
+		changeMultiText2 () {
+			console.clear();
+			console.log(`[Child] changeMultiText2 ...`);
+			this.$emit('emit-multi-text2', '子元件 arguments 參數 1', '子元件 arguments 參數 2', '子元件 arguments 參數 3');
+			// this.$emit('emitMultiText2', '子元件 arguments 參數 1', '子元件 arguments 參數 2', '子元件 arguments 參數 3');
+		},
+		
+		// 將參數封裝成物件
+		changeMultiText3 () {
+			console.clear();
+			console.log(`[Child] changeMultiText3 ...`);
+			
+			const obj = {
+				text: '子元件封裝物件參數 1', 
+				text2: '子元件封裝物件參數 2', 
+				text3: '子元件封裝物件參數 3'
+			};
+			
+			this.$emit('emit-multi-text3', obj);
+			// this.$emit('emitMultiText3', obj);
+		},
+		
+		// 父元件使用剩餘參數方式接收
+		changeMultiText4 () {
+			console.clear();
+			console.log(`[Child] changeMultiText4 ...`);
+			this.$emit('emit-multi-text4', '子元件剩餘參數 1', '子元件剩餘參數 2', '子元件剩餘參數 3');
+		},
+	},
+	template: `<p class="title mt-4">由子元件方法設定 emit</p>`
+			+ `<div class="flex-btn-group box mt-0">`
+			+ `<button type="button" @click="changeMultiText">改變父元件文字 (逐一對應)</button>`
+			+ `<button type="button" @click="changeMultiText2">改變父元件文字 (arguments)</button>`
+			+ `<button type="button" @click="changeMultiText3">改變父元件文字 (將參數封裝成物件)</button>`
+			+ `<button type="button" @click="changeMultiText4">改變父元件文字 (父元件使用剩餘參數寫法)</button>`
+			+ `</div>`
+			
+			+ `<p class="title">樣板直接設定 emit</p>`
+			+ `<div class="flex-btn-group box mt-0">`
+			+ `<button type="button" @click="$emit('emit-multi-text', '(樣板) 子元件逐一對應參數 1', '(樣板) 子元件逐一對應參數 2', '(樣板) 子元件逐一對應參數 3')">改變父元件文字 (逐一對應)</button>`
+			+ `<button type="button" @click="$emit('emit-multi-text4', '(樣板) 子元件剩餘參數 1', '(樣板) 子元件剩餘參數 2', '(樣板) 子元件剩餘參數 3')">改變父元件文字 (父元件使用剩餘參數寫法)</button>`
+			+ `</div>`
+});
+
+
+/* 父元件接收子元件及自己的參數 */
+app.component("param-child-parent", {
+	
+	/*
+		注意：原本定義的 emit 名稱若為 emit-param-test1-1，這邊的名稱必須寫作 emit-param-test11。
+		
+		否則會發生警告：
+		[Vue warn]: Extraneous non-emits event listeners (emitParamTest11) were passed to component but could not be automatically inherited because component renders fragment or text root nodes. If the listener is intended to be a component custom event listener only, declare it using the "emits" option. 
+	*/
+	emits: ['emit-param-test1', 'emit-param-test11', 'emit-param-test12', 'emit-param-test2', 'emit-param-test3', 'emit-param-test31'],
+	
+	methods: {
+		// 子元件一個參數，父元件一個參數
+		test1 () {
+			console.clear();
+			console.log(`[Child - test1] ...`);
+			this.$emit('emit-param-test1', "子元件參數");
+		},
+		// 子元件傳自己的 DOM 元素
+		test1_1 () {
+			console.clear();
+			console.log(`[Child - test1_1] ...`);
+			console.log(event);
+			this.$emit('emit-param-test1-1', event.target);
+		},
+		// 子元件和父元件參數可交換順序 (依據 HTML 中參數給入順序而定)
+		test1_2 () {
+			console.clear();
+			console.log(`[Child - test1_2] ...`);
+			this.$emit('emit-param-test1-2', "子元件參數");
+		},
+		
+		// 子元件一個參數，父元件多個參數
+		test2 () {
+			console.clear();
+			console.log(`[Child - test2] ...`);
+			this.$emit('emit-param-test2', "子元件參數");
+		},
+		
+		// 子元件多個參數 (arguments)，父元件一個參數
+		test3 () {
+			console.clear();
+			console.log(`[Child - test3] ...`);
+			this.$emit('emit-param-test3', "子元件參數 1", "子元件參數 2");
+		},
+		// 子元件多個參數 (封裝成物件)，父元件一個參數
+		test3_1 () {
+			console.clear();
+			console.log(`[Child - test3_1] ...`);
+			
+			const obj = {
+				param1: "子元件參數 1", 
+				param2: "子元件參數 2"
+			};
+			
+			this.$emit('emit-param-test3-1', obj);
+		},
+	},
+	
+	template: `<p class="title mt-4">由子元件方法設定 emit</p>`
+			+ `<div class="flex-btn-group box mt-0">`
+			+ `<button type="button" @click="test1">子元件一個參數，父元件一個參數</button>`
+			+ `<button type="button" @click="test1_1">子元件傳自己的 DOM 元素</button>`
+			+ `<button type="button" @click="test1_2">子元件和父元件參數可交換順序</button>`
+			+ `<button type="button" @click="test2">子元件一個參數，父元件多個參數</button>`
+			+ `<button type="button" @click="test3">子元件多個參數 (arguments)，父元件一個參數</button>`
+			+ `<button type="button" @click="test3_1">子元件多個參數 (封裝成物件)，父元件一個參數</button>`
+			+ `</div>`
+			
+			+ `<p class="title">樣板直接設定 emit</p>`
+			+ `<div class="flex-btn-group box mt-0">`
+			+ `<button type="button" @click="$emit('emit-param-test1', '(樣板) 子元件參數')">子元件一個參數，父元件一個參數</button>`
+			
+			// 不能這樣使用 event
+			// + `<button type="button" @click="$emit('emit-param-test1-1', event.target)">子元件傳自己的 DOM 元素</button>`
+			
+			+ `</div>`
+});
+
+app.mount('#app');
+
 </script>
+
+
 
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>

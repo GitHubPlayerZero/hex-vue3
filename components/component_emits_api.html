@@ -3,52 +3,160 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Emits 驗證</h1><small>檔名：<code>component_emits_api.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+
 <div id="app">
-  <h3>Emits API</h3>
-  {{ num }}
-  <button-counter @add="addNum"></button-counter>
-
-  <h3>驗證資料內容</h3>
-  <button-counter2 @add="addNum"></button-counter2>
-
+	
+	<!-- Emits API -->
+	<h2 class="mb-3">Emits API</h2>
+	<button-counter @add="addNum" class="mb-3"></button-counter>
+	{{ num }}
+	
+	<hr>
+	
+	<!-- 驗證資料內容 -->
+	<h2 class="mb-3">驗證資料內容</h2>
+	<button-counter2 @add = "addNum"></button-counter2>
+	
+	<hr>
+	
+	<!-- 綜合測試 -->
+	<h2 class="mb-3">綜合測試</h2>
+	<p>
+		由 test2 測試觀察發現，當子元件是經由 <span class="bold">方法</span> 觸發 Emit 時，執行過程會是：子元件方法 -> Emit 驗證 -> 父元件方法。<br>
+		而子元件方法會一直到父元件方法執行完畢後，才會結束。
+	</p>
+	
+	<mix-test 
+		@test1="test1" 
+		@test3="test1" 
+		@test4="test1" 
+	></mix-test>
+	
 </div>
 
+
 <script type="module">
-  const app = Vue.createApp({
-    data() {
-      return {
-        num: 0,
-      };
-    },
-    methods: {
-      addNum(num) {
-        this.num = this.num + num;
-      },
-    }
-  });
-
-  app.component('button-counter', {
-    data() {
-      return {
-        num: 1,
-      }
-    },
-    // 主要會出現在該值是由 data 定義，但難以追蹤他的變化時會出現
-    template: `
-      <!-- <button type="button" @click="num++">調整 num 的值</button> --> 
-      <button type="button">add</button>`,
-  });
-
-  app.component('button-counter2', {
-    emits: {},
-    template: `
-      <button type="button" @click="$emit('add', '1')">Emit 驗證是否為數值</button>
-    `,
-  })
+	
+const app = Vue.createApp({
+	data() {
+		return {
+			num: 0,
+		};
+	},
+	methods: {
+		addNum(num) {
+			this.num = this.num + num;
+		},
+		
+		test1 (param1, param2) {
+			console.log(`[Parent] test1 ...`);
+			console.log(`param1 ==>`, param1, typeof param1);
+			console.log(`param2 ==>`, param2, typeof param2);
+			console.log(``);
+		}
+	}
+});
 
 
-  app.mount('#app');
+/* Emits API */
+app.component('button-counter', {
+	data () {
+		return {
+			num: 1,
+		}
+	},
+	
+	// 主要會出現在該值是由 data 定義，但難以追蹤他的變化時會出現
+	emits: ['add'],
+	
+	template: `<div class="box">`
+			+ `<button type="button" @click="num++">+ 1</button>&nbsp;&nbsp;&nbsp;累加器初始值：{{ num }}`
+			+ `<br><br>`
+			+ `<button type="button" @click="$emit('add', num)">Add</button>`
+			+ `</div>`
+});
+
+
+/* 驗證資料內容 */
+app.component('button-counter2', {
+	emits: {
+		add: (param) => {
+			console.clear();
+			console.log(`param ==>`, param, typeof param);
+			
+			if (!(typeof param === 'number')) {
+				alert("參數必須為數字！")
+				return false;
+			}
+			
+			return true;
+		},
+	},
+	
+	template: `<button type="button" @click="$emit('add', '1')">Emit 驗證是否為數值 (字串)</button>&nbsp;&nbsp;&nbsp;`
+			+ `<button type="button" @click="$emit('add', 1)">Emit 驗證是否為數值 (數字)</button>`
+});
+
+
+/* 綜合測試 */
+app.component('mix-test', {
+	
+	template: `<div class="flex-btn-group">`
+			+ `<button type="button" @click="$emit('test1', 'T1', 1)">test1 (直接觸發 Emit，有驗證)</button>`
+			+ `<button type="button" @click="test2('T2', 2)">test2 (呼叫方法 test2 觸發 Emit，有驗證)</button>`
+			+ `<button type="button" @click="$emit('test3', 'T3', 3)">test3 (直接觸發 Emit，無驗證)</button>`
+			+ `<button type="button" @click="test4('T4', 4)">test4 (呼叫方法 test4 觸發 Emit，無驗證)</button>`
+			+ `</div>`
+			+ ``,
+	
+	emits: {
+		test1 (param1, param2) {
+			console.log(`[Child] test1 檢核 ...`);
+			console.log(`param1 ==>`, param1, typeof param1);
+			console.log(`param2 ==>`, param2, typeof param2);
+			console.log(``);
+			return true;
+		},
+	},
+	
+	methods: {
+		test2 (param1, param2) {
+			console.clear();
+			console.log(`[Child] test2 方法 ...`);
+			console.log(`param1 ==>`, param1, typeof param1);
+			console.log(`param2 ==>`, param2, typeof param2);
+			
+			console.log(`before $emit (test1) ...`);
+			console.log(``);
+			
+			this.$emit('test1', param1, param2);
+			
+			console.log(`after $emit (test1) ...`);
+			console.log(``);
+		},
+		
+		test4 (param1, param2) {
+			console.clear();
+			console.log(`[Child] test4 方法 ...`);
+			console.log(`param1 ==>`, param1, typeof param1);
+			console.log(`param2 ==>`, param2, typeof param2);
+			
+			console.log(`before $emit (test4) ...`);
+			console.log(``);
+			
+			this.$emit('test4', param1, param2);
+			
+			console.log(`after $emit (test4) ...`);
+			console.log(``);
+		},
+	},
+});
+
+app.mount('#app');
+
 </script>
+
+
 
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
