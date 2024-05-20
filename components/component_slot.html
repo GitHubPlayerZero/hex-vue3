@@ -1,67 +1,211 @@
-<!DOCTYPE html><html><head><title>元件插巢</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
+<!DOCTYPE html><html><head><title>元件插槽</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
 <div class="container main my-5"><div class="row"><main class="col post">
-<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">元件插巢</h1><small>檔名：<code>component_slot.html</code></small></div>
+<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">元件插槽</h1><small>檔名：<code>component_slot.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+
+
 <div id="app">
-  <h3>Slot 插巢與插巢預設值</h3>
-  <card>
-  </card>
-  <br>
-  <card></card>
-
-  <h3>具名插巢</h3>
-  <card2>
-    <template >我喜歡這張卡片</template>
-    <!--  預設請加入 default  -->
-    <template >這是卡片 2 號</template>
-    <template >這是卡片腳</template>
-  </card2>
-
-
-  <h3>具名插巢縮寫</h3>
-  <card2>
-    <template v-slot:header>我喜歡這張卡片</template>
-    <!--  預設請加入 default  -->
-    <template v-slot:default>這是卡片 2 號</template>
-    <template v-slot:footer>這是卡片腳</template>
-  </card2>
-
+	
+	<!-- Slot 插槽與預設值 -->
+	<h2 class="mb-4">基本範例：Slot 插槽與預設值</h2>
+	
+	<p>父元件有放內容。</p>
+	<card>
+		<p>父元件的內容</p>
+		<p>有多少內容</p>
+		<p>都會全部放進去</p>
+	</card>
+	
+	<br>
+	
+	<p>父元件沒放內容，使用子元件預設內容。</p>
+	<card></card>
+	
+	<hr>
+	
+	<!-- 多個 slot -->
+	<h2 class="mb-4">多個插槽</h2>
+	
+	<p>子元件提供插槽示例。</p>
+	<card-multi-slot></card-multi-slot>
+	
+	<br>
+	
+	<p>slot 都不具名。</p>
+	<card-multi-slot>
+		<p>父元件的內容</p>
+	</card-multi-slot>
+	
+	<br>
+	
+	<p>Header、Footer 給予名稱。</p>
+	<card-multi-slot2>
+		<p>父元件的內容</p>
+	</card-multi-slot2>
+	
+	<hr>
+	
+	<!-- 具名插槽 -->
+	<h2 class="mb-4">具名插槽</h2>
+	
+	<p>子元件提供插槽示例。</p>
+	<card2></card2>
+	
+	<br>
+	
+	<h3 class="mb-3">沒有給預設插槽內容</h3>
+	<card2>
+		<template v-slot:header>父元件的 Header</template>
+		<template v-slot:footer>父元件的 Footer</template>
+	</card2>
+	
+	<br>
+	
+	<h3 class="mb-3">給入預設插槽內容</h3>
+	<card2>
+		<template v-slot:header>父元件的 Header</template>
+		
+		<!-- 預設請加入 default  -->
+		<template v-slot:default>父元件的 default</template>
+		
+		<template v-slot:footer>父元件的 Footer</template>
+	</card2>
+	
+	<br>
+	
+	<!-- 縮寫 -->
+	<h3 class="mb-3">縮寫</h3>
+	<p>使用 <code class="bold">#</code> 代替 <code class="bold">v-slot:</code></p>
+	
+	<card2>
+		<template #header>父元件的 Header</template>
+		
+		<!-- 預設請加入 default  -->
+		<template #default>父元件的 default</template>
+		
+		<template #footer>父元件的 Footer</template>
+	</card2>
+	
+	<hr>
+	
+	<!-- 不標準寫法 -->
+	<h2 class="mb-3">不標準寫法測試</h2>
+	<p>以下寫法雖不標準，但依然可以產出正常的畫面。</p>
+	
+	<h3 class="title mt-4">給入預設插槽內容的另一種做法</h3>
+	<p>沒有給 default template，而是直接在子元件區塊內寫入內容（如第一個的基本範例），亦會被當作預設插槽的內容。</p>
+	
+	<card2>
+		我不在 template 裡，但我會成為預設插槽的內容。
+		<template v-slot:header>父元件的 Header</template>
+		<template v-slot:footer>父元件的 Footer</template>
+	</card2>
+	
+	<br>
+	
+	<p>但是要注意，若同時有給予 default template，則上述做法會被忽略，並且 console 會出現警告訊息。</p>
+	
+	<card2>
+		我不在 template 裡，但我會成為預設插槽的內容。
+		<template v-slot:header>父元件的 Header</template>
+		
+		<!-- 預設請加入 default  -->
+		<template v-slot:default>父元件的 default template</template>
+		
+		<template v-slot:footer>父元件的 Footer</template>
+	</card2>
+	
+	<br>
+	
+	<h3 class="title mt-3">template 不按順序排</h3>
+	<p>即使 template 的排列沒有按照 slot 出現的順序，也不會出錯。</p>
+	
+	<card2>
+		<template v-slot:footer>父元件的 Footer</template>
+		<template v-slot:default>父元件的 default template</template>
+		<template v-slot:header>父元件的 Header</template>
+	</card2>
+	
 </div>
 
-<script type="module">
-  const app = Vue.createApp({
-  });
-  app.component('card', {
-    template: `<div class="card" style="width: 18rem;">
-      <div class="card-header">
-        元件 Header
-      </div>
-      <div class="card-body">
-        <p>這段是預設的文字</p>
-      </div>
-      <div class="card-footer">
-        元件 Footer
-      </div>
-    </div>`
-  })
 
-  app.component('card2', {
-    template: `<div class="card" style="width: 18rem;">
-      <div class="card-header">
-        <slot>元件 Header</slot>
-      </div>
-      <div class="card-body">
-        <slot>這段是預設的文字</slot>
-      </div>
-      <div class="card-footer">
-        <slot>元件 Footer</slot>
-      </div>
-    </div>`
-  });
 
-  app.mount('#app');
+<script>
+
+const app = Vue.createApp({
+	
+});
+
+
+/* Slot 插槽與預設值 */
+app.component('card', {
+	template: `<div class="card" style="width: 18rem;">`
+			+ `<div class="card-header">`
+			+ `子元件 Header`
+			+ `</div>`
+			+ `<div class="card-body">`
+			// + `<slot></slot>`
+			+ `<slot><p>我是子元件預設內容</p></slot>`
+			+ `</div>`
+			+ `<div class="card-footer">`
+			+ `子元件 Footer`
+			+ `</div>`
+			+ `</div>`
+});
+
+
+/* 多個插槽 */
+app.component('card-multi-slot', {
+	template: `<div class="card" style="width: 18rem;">`
+			+ `<div class="card-header">`
+			+ `<slot>子元件 Header 插槽</slot>`
+			+ `</div>`
+			+ `<div class="card-body">`
+			+ `<slot>子元件 Body  插槽</slot>`
+			+ `</div>`
+			+ `<div class="card-footer">`
+			+ `<slot>子元件 Footer 插槽</slot>`
+			+ `</div>`
+			+ `</div>`
+});
+
+app.component('card-multi-slot2', {
+	template: `<div class="card" style="width: 18rem;">`
+			+ `<div class="card-header">`
+			+ `<slot name="header">子元件 Header 插槽</slot>`
+			+ `</div>`
+			+ `<div class="card-body">`
+			+ `<slot>子元件 Body  插槽</slot>`
+			+ `</div>`
+			+ `<div class="card-footer">`
+			+ `<slot name="footer">子元件 Footer 插槽</slot>`
+			+ `</div>`
+			+ `</div>`
+});
+
+
+/* 具名插槽 */
+app.component('card2', {
+	template: `<div class="card" style="width: 18rem;">`
+			+ `<p><slot>我是子元件預設插槽 2</slot></p>`
+			+ `<div class="card-header">`
+			+ `<slot name="header">子元件 Header 插槽</slot>`
+			+ `</div>`
+			+ `<div class="card-body">`
+			+ `<slot>我是子元件預設插槽 1</slot>`
+			+ `</div>`
+			+ `<div class="card-footer">`
+			+ `<slot name="footer">子元件 Footer 插槽</slot>`
+			+ `</div>`
+			+ `</div>`
+});
+
+app.mount('#app');
+
 </script>
+
+
 
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
@@ -116,14 +260,14 @@
       class="list-group-item list-group-item-action
         
         active">
-      元件插巢
+      元件插槽
     </a>
   
     <a href="/components/component_slot_props.html"
       class="list-group-item list-group-item-action
         
         ">
-      元件插巢 Props
+      元件插槽 Props
     </a>
   
     <a href="/components/component_mitt.html"

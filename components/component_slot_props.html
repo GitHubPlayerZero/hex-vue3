@@ -1,78 +1,169 @@
-<!DOCTYPE html><html><head><title>元件插巢 Props</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
+<!DOCTYPE html><html><head><title>元件插槽 Props</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
 <div class="container main my-5"><div class="row"><main class="col post">
-<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">元件插巢 Props</h1><small>檔名：<code>component_slot_props.html</code></small></div>
+<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">元件插槽 Props</h1><small>檔名：<code>component_slot_props.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+
 <div id="app">
-  <h3>插巢 Prop</h3>
-  <p>將元件內的變數取出使用，稱為 slot prop</p>
-  <card>
-    <template>
-      我想取出元件的值來使用
-    </template>
-  </card>
-  <hr>
-  <h2>多個（解構）</h2>
-  {{ product }}
-  <card2 :product="product">
-    <template #header>
-      買早餐
-    </template>
-    <template #default>
-    </template>
-  </card2>
+	
+	<!-- 插槽 Prop -->
+	<h2 class="mb-3">插槽 Prop</h2>
+	<p>將元件內的變數取出使用，稱為 slot prop。</p>
+	<p>傳出來的參數會被包成物件。</p>
+	
+	<card>
+		<!-- 父元件接收子元件傳遞的參數，slotProps 為自訂義名稱 -->
+		<template #default="slotProps">
+			<p class="box">
+				子元件裡傳出的值：<br>
+				{{ slotProps }}
+			</p>
+			
+			<p class="box">
+				取出 product：<br>
+				{{slotProps.propProduct}}
+			</p>
+			
+			<p class="box">
+				產品名稱：{{ slotProps.propProduct.name }}<br>
+				價格：{{ slotProps.propProduct.price }}
+			</p>
+		</template>
+	</card>
+	
+	<br>
+	
+	<hr>
+	
+	<!-- 多個參數（解構） -->
+	<h2 class="mb-3">多個參數（解構）</h2>
+	<p>解構還可搭配給予預設值，若子元件沒有傳遞這個參數，就會使用預設值。</p>
+	
+	<!-- 簡單範例 -->
+	<h3>簡單範例</h3>
+	
+	<card1>
+		<!--
+			1. 參數沒有順序關係，認名稱。
+			2. 不管子元件樣板給入的參數命名是駝峰還是烤肉串，這邊都要用小駝峰命名接收。
+		-->
+		<!-- <template #default="{childPropA, childPropB, childPropC='預設值', childPropD='預設值', childPropE=-1}"> -->
+		<template #default="{childPropB, childPropC='預設值', childPropD='預設值', childPropE=-1, childPropA}">
+			<p>childPropA：{{childPropA}}</p>
+			<p>childPropB：{{childPropB}}</p>
+			<p>childPropC：{{childPropC}}</p>
+			<p>childPropD：{{childPropD}}</p>
+			<p>childPropE：{{childPropE}}</p>
+		</template>
+	</card1>
+	
+	
+	<!-- 複雜範例 -->
+	<h3 class="mt-5">複雜範例</h3>
+	<p>父元件傳入自己的資料給子元件，子元件再傳出來。</p>
+	
+	<card2 :parent-product="product">
+		<template #default="{childProduct, veganName='預設值', remark='預設值'}">
+			
+			<p class="box">
+				Product：<br>
+				{{ childProduct }}
+			</p>
+			
+			<p>veganName：{{veganName}}</p>
+			<p>remark：{{remark}}</p>
+			
+		</template>
+	</card2>
+	
 </div>
 
-<script type="module">
-  const app = Vue.createApp({
-    data() {
-      return {
-        product: {
-          name: '蛋餅',
-          price: 30,
-          vegan: false
-        }
-      }
-    },
-  });
 
-  app.component('card', {
-    data() {
-      return {
-        product: {
-          name: '蛋餅',
-          price: 30,
-          vegan: false
-        },
-      }
-    },
-    template: `<div class="card" style="width: 18rem;">
-      <div class="card-body" >
-        <slot :product="product"></slot>
-      </div>
-    </div>`
-  });
+<script>
 
-  app.component('card2', {
-    props: ['product'],
-    data() {
-      return {
-        veganName: ''
-      }
-    },
-    created() {
-      console.log()
-      this.veganName = this.product.vegan ? '素食' : '非素食';
-    },
-    template: `<div class="card" style="width: 18rem;">
-      <div class="card-body" >
-        <slot :product="product" :veganName="veganName"></slot>
-      </div>
-    </div>`
-  })
+const app = Vue.createApp({
+	data() {
+		return {
+			product: {
+				name: '蛋餅',
+				price: 30,
+				vegan: false
+			}
+		}
+	},
+});
 
-  app.mount('#app');
+
+/* 插槽 Prop */
+app.component('card', {
+	data() {
+		return {
+			product: {
+				name: '蛋餅',
+				price: 30,
+				vegan: false
+			},
+		}
+	},
+	template: `<p class="box">子元件資料 (product)：<br>{{product}}</p>`
+			+ `<div class="card" style="width: 18rem;">`
+			+ `<div class="card-body" >`
+			// 子元件用 v-bind 綁定要傳遞的參數，propProduct 為自訂義參數名稱
+			+ `<slot :propProduct="product"></slot>`
+			+ `</div>`
+			+ `</div>`
+});
+
+
+/* 多個（解構） */
+// 簡單範例
+app.component('card1', {
+	data () {
+		return {
+			propA: 100,
+			propB: { name: '我是子元件物件資料' }
+		}
+	},
+	
+	template: ``
+			+ `<div class="box">`
+			
+			/*
+				子元件模板的 props 命名似乎比較寬鬆，可用小駝峰、烤肉串，甚至混合都沒問題！
+				但是不能使用大駝峰，ChildPropD 使用了大駝峰，父元件將無法接收到，因此最後會使用預設值。
+			*/
+			+ `<slot :child-prop-a="propA" :childPropB="propB" child-propC="我是子元件字串資料" ChildPropD="我是 prop D！"></slot>`
+			
+			+ `</div>`
+});
+
+// 複雜範例
+app.component('card2', {
+	
+	props: ['parentProduct'],
+	
+	data () {
+		return {
+			veganName: 'none'
+		}
+	},
+	
+	created () {
+		this.veganName = this.parentProduct.vegan ? '素食' : '非素食';
+	},
+	
+	template: `<div class="card" style="width: 18rem;">`
+			+ `<div class="card-body">`
+			+ `<slot :childProduct="parentProduct" :veganName="veganName"></slot>`
+			+ `</div>`
+			+ `</div>`
+});
+
+app.mount('#app');
+
 </script>
+
+
 
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
@@ -127,14 +218,14 @@
       class="list-group-item list-group-item-action
         
         ">
-      元件插巢
+      元件插槽
     </a>
   
     <a href="/components/component_slot_props.html"
       class="list-group-item list-group-item-action
         
         active">
-      元件插巢 Props
+      元件插槽 Props
     </a>
   
     <a href="/components/component_mitt.html"

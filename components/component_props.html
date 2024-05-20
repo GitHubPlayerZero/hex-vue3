@@ -46,6 +46,18 @@
 	
 	<photo3 :super-url="imgUrl"></photo3>
 	
+	<hr>
+	
+	<!-- Props 與生命週期測試 -->
+	<h2>Props 與生命週期測試</h2>
+	
+	<ul>
+		<li>子元件接收的 props 會被加入自己的資料裡。</li>
+		<li>在 beforeCreate 週期，此時元件自己宣告的資料尚未初始化，但已可使用 props 的資料。</li>
+	</ul>
+	
+	<props-lifecycle :parent-prop="'我是父元件給入的參數'"></props-lifecycle>
+	
 </div>
 
 
@@ -85,6 +97,49 @@ app.component('photo3', {
 	props: ['superUrl'],
 	template: `<img :src="superUrl" class="img-thumbnail" alt>`
 })
+
+
+/* Props 與生命週期測試 */
+app.component('propsLifecycle', {
+	
+	// props 會被加進元件資料裡
+	props: ['parentProp'],
+	
+	// 會最先執行，而此時 props 已可以使用
+	beforeCreate () {
+		console.log(``);
+		console.log(`[beforeCreated] parentProp ==>`, this.parentProp);
+		console.log(`[beforeCreated] childName ==>`, this.childName);
+		console.log(``);
+	},
+	
+	// 排第二執行，props 已可以使用，但 data 還不行
+	data () {
+		console.log(`[data] parentProp ==>`, this.parentProp);
+		console.log(`[data] childName ==>`, this.childName);
+		console.log(``);
+		
+		return {
+			childName: '我是子元件資料',
+		}
+	},
+	
+	// 排第三執行，props、data 均可以使用，
+	created () {
+		console.log(`[created] parentProp ==>`, this.parentProp);
+		console.log(`[created] childName ==>`, this.childName);
+		console.log(``);
+		console.log(this);
+		console.log(``);
+	},
+	
+	template: `<div class="card" style="width: 18rem;">`
+			+ `<div class="card-body" >`
+			+ `{{ parentProp }}<br>{{ childName }}`
+			+ `</div>`
+			+ `</div>`
+});
+
 app.mount('#app');
 
 </script>
