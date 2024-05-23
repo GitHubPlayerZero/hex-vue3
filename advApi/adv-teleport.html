@@ -3,59 +3,123 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Teleport</h1><small>檔名：<code>adv-teleport.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+
+<ul>
+	<li>使用 teleport 移動的內容，會以 append 的方式加入到綁定的元素內，成為其最後一個子元素。</li>
+	<li>teleport 可綁定 ID、class、元素標籤。</li>
+</ul>
+
 <div id="app">
-  <div id="target"></div>
-
-  <h3>Teleport 自訂義元件位置</h3>
-  結構：<code>&lt;teleport to="{ target }"&gt;</code>
-  <card></card>
-
-  <h3>使用限制（錯誤情境）</h3>
-  <card2></card2>
-
-  <h3>實用技巧（取代標題、多個）</h3>
-<!--  <new-title></new-title>-->
+	
+	<div class="box" id="teleport1">
+		<p><code>class="box" id="teleport1"</code></p>
+	</div>
+	
+	<div class="box teleport2">
+		<p><code>class="box teleport2"</code></p>
+	</div>
+	
+	<!-- Teleport 自訂義元件位置 -->
+	<h2 class="mb-4">Teleport 自訂義元件位置</h2>
+	<card></card>
+	
+	<hr>
+	
+	<!-- 使用限制（錯誤情境） -->
+	<h2 class="mb-4">使用限制（錯誤情境）</h2>
+	<p>teleport 綁定的目標不存在，或尚未被渲染出來。</p>
+	<p>以下 teleport 內容因為綁定有問題，因此無法出現，console 會有警告訊息。</p>
+	<card2></card2>
+	
+	<hr>
+	
+	<!-- 實用技巧（取代標題、多個綁定） -->
+	<h2 class="mb-4" id="h2Skill">實用技巧（取代標題、多個綁定）</h2>
+	<p>註：teleport 可綁定 v-if 判斷。</p>
+	<new-title></new-title>
+	
 </div>
 
+
+
 <script>
-const app = Vue.createApp({
+
+const app = Vue.createApp({});
+
+
+/* Teleport 自訂義元件位置 */
+app.component('card', {
+	
+	template: `<p>以下為子元件內部</p>`
+		+ `<h5 class="box mt-0"><p><code>&lt;h5></code></p></h5>`
+		+ `<div id="divComponent">`
+		
+		// [Vue warn]: Failed to locate Teleport target with selector "h5". Note the target element must exist before the component is mounted - i.e. the target cannot be rendered by the component itself, and ideally should be outside of the entire Vue component tree. 
+		// + `<h5 class="box mt-0"><p><code>&lt;h5></code></p></h5>`
+		
+		+ `<div class="alert alert-danger">Card Teleport 元素 1（原本正常的位置）</div>`
+		// 綁定 ID
+		+ `<teleport to="#teleport1">`
+		+ `<div class="alert alert-danger">Card Teleport 元素 2（綁定 DOM 元素 ID）</div>`
+		+ `</teleport>`
+		// 綁定 class
+		+ `<teleport to=".teleport2">`
+		+ `<p>Card Teleport 元素 3（綁定 DOM 元素 class (teleport2)）</p>`
+		+ `<p>這整塊屬於同一個 teleport 區塊。</p>`
+		+ `<div class="alert alert-danger">Card Teleport 元素 3-1</div>`
+		+ `<div class="alert alert-danger">Card Teleport 元素 3-2</div>`
+		+ `</teleport>`
+		// 綁定 class
+		// class 有出現在多個地方，但 teleport 只會將其移動到第一個出現的地方。
+		+ `<teleport to=".box">`
+		+ `<div class="alert alert-danger">Card Teleport 元素 4（綁定 DOM 元素 class (box)）</div>`
+		+ `</teleport>`
+		
+		/*
+			綁定元素標籤，且為 template 自己定義的元素。
+			這邊要注意！經過測試，由於此段內容是被包覆在一個 div 之內（divComponent），若 h5 也是在此 div 之內，則會出現找不到元素的問題。
+			若將 h5 放置於此 div 之後也會有問題，必須將 h5 放置在此 div 之前。
+			這可能是與 template 的解析方式有關，個人推測，teleport 可能是隨著 DOM 元素一起被解析的，所以綁定的目標不能在同一塊 DOM 元素裡 (此時 DOM 元素尚未被渲染出來)，因此綁定的目標必須位於 teleport 本身所在元素之前...
+		*/
+		+ `<teleport to="h5">`
+		+ `<div class="alert alert-danger">Card Teleport 元素 5（綁定 DOM 元素標籤 &lt;h5>，且為 template 自己定義的元素）</div>`
+		+ `</teleport>`
+		+ `</div>`
+});
+
+
+/* 使用限制（錯誤情境） */
+app.component('card2', {
+	template: `<div class="box">`
+		// [Vue warn]: Failed to locate Teleport target with selector ".col-md-3". Note the target element must exist before the component is mounted - i.e. the target cannot be rendered by the component itself, and ideally should be outside of the entire Vue component tree. 
+		+ `<teleport to=".col-md-3">`
+		+ `<div class="alert alert-danger">Card2 被招喚的元素</div>`
+		+ `</teleport>`
+		+ `</div>`
 })
 
-  app.component('card', {
-    data() {
-      return {
-        title: '文件標題',
-        content: '文件內文',
-        toggle: false
-      }
-    },
-    template: `
-      <div class="card" style="width: 18rem;">
-        <div class="card-body">
-          <h5 class="card-title">{{ title }}</h5>
-          <p class="card-text">{{ content }}</p>
-          <button type="button" @click="toggle = !toggle">切換元素顯示</button>
-        </div>
-      </div>
 
-      <div v-if="toggle" class="alert alert-danger">被招喚的元素</div>
-    `,
-    props: ['item']
-  });
+/* 實用技巧（取代標題、多個綁定） */
+app.component('new-title', {
+	data () {
+		return {
+			toggle: false
+		}
+	},
+	
+	template: `<p v-if="toggle">Teleport 綁定 <code>title</code>、<code>h1</code>、<code>#h2Skill</code></p>`
+			+ `<teleport to="title" v-if="toggle"> - 新增的 title 片段</teleport>`
+			+ `<teleport to="h1" v-if="toggle"> - 新增的 h1 片段</teleport>`
+			+ `<teleport to="#h2Skill" v-if="toggle"> - 新增的 h2 片段</teleport>`
+			+ `<button type="button" @click="toggle = !toggle">{{ toggle? "關閉 Teleport" : "開啟 Teleport" }}</button>`
+			+ ``
+})
 
-  app.component('card2', {
-    template: `
-      <div class="alert alert-danger">被招喚的元素</div>
-    `
-  })
+app.mount('#app');
 
-  app.component('new-title', {
-    template: `<teleport to="title"> - 新增的標題片段</teleport>
-    <teleport to="h1"> - 新增的文字片段</teleport>`
-  })
-
-  app.mount('#app');
 </script>
+
+
 
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>

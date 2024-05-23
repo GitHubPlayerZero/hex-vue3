@@ -3,75 +3,284 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Refs</h1><small>檔名：<code>adv-refs.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
-<div id="app">
-  <h3>使用 ref 定義元素</h3>
-  <input type="text">
 
-  <h3>使用 ref 取得元件內的資訊</h3>
-  <button type="button" @click="getComponentInfo">取得元件資訊</button>
-  <card></card>
+<!-- 使用 ref 定義元素 -->
+<h2>使用 ref 定義元素</h2>
+<div id="app1">
+	
+	<div class="box">
+		
+		<div class="grid">
+			<input type="text" ref="input1">&nbsp;
+			<input type="button" value="Focus" @click="focusInputText">&nbsp;
+			<input type="button" value="Set value" @click="setInputTextValue">
+		</div>
+		
+		<div class="grid">
+			<select ref="select1" @change="changeSelect">
+				<option value="">請選擇</option>
+				<option value="option1">項目一</option>
+				<option value="option2">項目二</option>
+			</select>
+		</div>
+		
+	</div>
+	
+	<div class="box d-flex gap-5">
+		<label>
+			<input type="checkbox" value="我是核取方塊一" name="chkbox1" @click="clickChkbox" ref="chkbox1">&nbsp;
+			核取方塊一
+		</label>
+		<label>
+			<input type="checkbox" value="我是核取方塊二" name="chkbox1" @click="clickChkbox" ref="chkbox2">&nbsp;
+			核取方塊二
+		</label>
+		<label>
+			<input type="checkbox" value="我是核取方塊三" name="chkbox1" @click="clickChkbox" ref="chkbox3">&nbsp;
+			核取方塊三
+		</label>
+	</div>
+	
+	<div class="box d-flex gap-5">
+		<label>
+			<input type="radio" value="我是 radio 1" name="radio1" @click="clickRadio" ref="radio1">&nbsp;
+			Radio 1
+		</label>
+		<label>
+			<input type="radio" value="我是 radio 2" name="radio1" @click="clickRadio" ref="radio2">&nbsp;
+			Radio 2
+		</label>
+		<label>
+			<input type="radio" value="我是 radio 3" name="radio1" @click="clickRadio" ref="radio3">&nbsp;
+			Radio 3
+		</label>
+	</div>
+	
+</div>
 
-  <h3>進階，使用 ref 搭配 Bootstrap</h3>
-  Bootstrap Modal: <a href="https://getbootstrap.com/docs/5.0/components/modal/">https://getbootstrap.com/docs/5.0/components/modal/</a>
-  <button @click="openModal">開啟 Bootstrap Modal</button>
-  <div class="modal" tabindex="-1" ref="modal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Modal title</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>Modal body text goes here.</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
+<hr>
+
+<!-- 使用 ref 取得元件內的資訊 -->
+<h2 class="mb-3">使用 ref 取得元件內的資訊</h2>
+
+<div id="app2">
+	
+	<div class="box">
+		<p>子元件標題：{{ childTitle }}</p>
+		<p>子元件內容：{{ childContent }}</p>
+		<button type="button" @click="getComponentInfo">取得元件資訊</button>
+	</div>
+	
+	<card ref="card"></card>
+	<br>
+	<button type="button" @click="changeComTitle">修改子元件標題</button>&nbsp;
+	<button type="button" @click="changeComContent">修改子元件內文</button>
+	
+</div>
+
+<hr>
+
+<!-- 進階範例 -->
+<h2>進階範例</h2>
+<p>使用 ref 搭配 Bootstrap。</p>
+
+<p class="mb-0">文件：</p>
+<ul class="mb-4">
+	<li><a href="https://getbootstrap.com/docs/5.0/components/modal/" target="_blank">Bootstrap Modal (英文版)</a></li>
+	<li><a href="https://bootstrap5.hexschool.com/docs/5.1/components/modal/#via-javascript" target="_blank">Bootstrap Modal (中文版)</a></li>
+</ul>
+
+<div id="app3">
+	
+	<button @click="openModal">開啟 Bootstrap Modal</button>
+	
+	<div class="modal" tabindex="-1" ref="modal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Modal title</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>Modal body text goes here.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary">Save changes</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </div>
 
+
 <!-- 另外載入 Bootstrap CDN -->
 <script>
+
+/* 使用 ref 定義元素 */
+console.log(`********** [Create #app1] **********`);
+
+const app1 = Vue.createApp({
+	
+	methods: {
+		focusInputText () {
+			this.$refs.input1.focus();
+		},
+		
+		setInputTextValue () {
+			this.$refs["input1"].value = "我是預設文字";
+		},
+		
+		changeSelect (event) {
+			const elmtSelect = event.target;
+			console.dir(elmtSelect);
+			console.log(elmtSelect.options);
+			console.log(`option index ==>`, elmtSelect.selectedIndex);
+			console.log(`value ==>`, elmtSelect.value);
+			console.log(`text ==>`, elmtSelect.selectedOptions[0].text);
+			
+			this.$refs.input1.value = elmtSelect.selectedOptions[0].text;
+		},
+		
+		clickChkbox () {
+			const chkboxList = document.querySelectorAll("input[name=chkbox1]:checked");
+			console.log(`有勾選的 checkbox ==>`, chkboxList);
+			this.showValue(chkboxList);
+		},
+		
+		clickRadio () {
+			const radioList = document.querySelectorAll("input[name=radio1]:checked");
+			console.log(`有勾選的 radio ==>`, radioList);
+			this.showValue(radioList);
+		},
+		
+		showValue (elmtList) {
+			elmtList.forEach(item => {
+				console.log(item.value);
+			});
+		}
+	},
+	
+	// 操作 DOM 元素需在此生命週期
+	mounted () {
+		console.log(`mounted ==>`, this);
+		console.log(``);
+		
+		/* 使用 refs 操作 DOM 元素 */
+		console.log(`this.$refs ==>`, this.$refs);
+		console.log(``);
+		
+		console.log(`input1 ==>`, this.$refs.input1);
+		console.log(`select1 ==>`, this.$refs['select1']);
+		console.log(`chkbox2 ==>`, this.$refs.chkbox2);
+		console.log(`radio3 ==>`, this.$refs["radio3"]);
+		
+		console.log(``);
+		
+		/* 使用 JS 操作 DOM 元素 */
+		console.log('checkbox ...');
+		console.log(document.querySelectorAll("input[name=chkbox1]"));
+		
+		console.log(``);
+		
+		console.log(`radio ...`);
+		console.log(document.querySelectorAll("input[name=radio1]"));
+	},
+	
+}).mount("#app1");
+
+console.log(``);console.log(``);
+
+
+/* 使用 ref 取得元件內的資訊 */
+console.log(`********** [Create #app2] **********`);
+
+const app2 = Vue.createApp({
+	
+	data () {
+		return {
+			childTitle: '',
+			childContent: '',
+		}
+	},
+	
+	methods: {
+		getComponentInfo () {
+			console.log(`[getComponentInfo] this.$refs.card ==>`, this.$refs.card);
+			this.childTitle = this.$refs.card.title;
+			this.childContent = this.$refs.card.content;
+		},
+		
+		changeComTitle () {
+			console.log(`[changeComTitle] this.$refs.card ==>`, this.$refs.card);
+			this.$refs.card.title = "我把子元件標題改掉了！";
+		},
+		
+		changeComContent () {
+			console.log(`[changeComContent] this.$refs.card ==>`, this.$refs.card);
+			this.$refs.card.content = "我把子元件內文改掉了！哈哈哈！";
+		},
+	},
+	
+	mounted () {
+		console.log(`this.$refs ==>`, this.$refs);
+	}
+});
+
+app2.component('card', {
+	data () {
+		return {
+			title: '我是子元件標題 1234567',
+			content: '我是子元件內文 abcdefg'
+		}
+	},
+	
+	template: `<div class="card" style="width: 18rem;">`
+			+ `<div class="card-body">`
+			+ `<h5 class="card-title">{{ title }}</h5>`
+			+ `<p class="card-text">{{ content }}</p>`
+			+ `</div>`
+			+ `</div>`,
+});
+
+app2.mount("#app2");
+
+console.log(``);console.log(``);
+
+
+/* 進階範例 */
+console.log(`********** [Create #app3] **********`);
+
 const app = Vue.createApp({
-  data() {
-    return {
-      bsModal: ''
-    }
-  },
-  methods: {
-    getComponentInfo() {
-
-    },
-    openModal() {
-
-    }
-  },
-  mounted() {
-
-  }
+	data () {
+		return {
+			bsModal: ''
+		}
+	},
+	
+	methods: {
+		openModal () {
+			this.bsModal.show();
+		}
+	},
+	
+	// 操作 DOM 元素需在此生命週期
+	mounted () {
+		console.log(`this.$refs ==>`, this.$refs);
+		this.bsModal = new bootstrap.Modal(this.$refs.modal);
+		console.log(`bsModal ==>`, this.bsModal);
+	},
+	
 })
 
-  app.component('card', {
-    data() {
-      return {
-        title: '文件標題',
-        content: '文件內文'
-      }
-    },
-    template: `
-      <div class="card" style="width: 18rem;">
-        <div class="card-body">
-          <h5 class="card-title">{{ title }}</h5>
-          <p class="card-text">{{ content }}</p>
-        </div>
-      </div>
-    `,
-  }).mount('#app');
+app.mount('#app3');
+
+console.log(``);
+console.log(``);
+
 </script>
+
 
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
