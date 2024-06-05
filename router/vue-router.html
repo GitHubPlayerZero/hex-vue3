@@ -2,31 +2,83 @@
 <div class="container main my-5"><div class="row"><main class="col post">
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">路由</h1><small>檔名：<code>vue-router.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
+
+
 <script src="https://unpkg.com/vue-router@4.0.5/dist/vue-router.global.js"></script>
+
 <div id="app">
-  <h2>路由示範</h2>
-  {{ text }}
+	<h2>路由示範</h2>
+	<p>{{ text }}</p>
+	
+	<div class="mb-4">
+		<router-link to="/">回首頁</router-link>｜
+		<router-link to="/a" title="A 頁面">相思</router-link>｜
+		<router-link to="/b" title="B 頁面">靜夜思</router-link>
+	</div>
+	
+	<router-view></router-view>
 </div>
+
+
 <script>
+
+// 元件 A (頁面 A)
+const comA = {
+	template: ``
+		+ `<h3 class="title">A 頁面</h3>`
+		+ `<p class="bold">相思</p>`
+		+ `<p>紅豆生南國，春來發幾枝。<br>`
+		+ `勸君多採擷，此物最想吃。`
+		+ `</p>`,
+};
+
+// 元件 B (頁面 B)
+const comB = {
+	template: ``
+		+ `<h3 class="title">B 頁面</h3>`
+		+ `<p class="bold">靜夜思</p>`
+		+ `<p>`
+		+ `床前明月光，疑是地上霜。<br>`
+		+ `舉頭望明月，低頭吃便當。`
+		+ `</p>`,
+};
+
+// 路由表
+const routingTable = [
+	{
+		path: '/a',
+		component: comA,
+	},
+	{
+		path: '/b',
+		component: comB,
+	},
+];
+
 const app = Vue.createApp({
-  data() {
-    return {
-      counter: 0,
-      text: '這裡有一段文字'
-    }
-  }
+	data () {
+		return {
+			counter: 0,
+			text: '唐詩三百首 (主頁面)'
+		}
+	}
 });
 
 // 路由設定
-// const router = VueRouter.createRouter({
-//   // 網址路徑模式：使用網址 hash 的形式
-//   history: VueRouter.createWebHashHistory(),
-//   // 匯入路由表
-//   routes: []
-// });
+const router = VueRouter.createRouter({
+	// 網址路徑模式：使用網址 hash 的形式
+	history: VueRouter.createWebHashHistory(),
+	
+	// 匯入路由表
+	routes: routingTable
+});
+app.use(router);
 
 app.mount('#app');
+
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
   
