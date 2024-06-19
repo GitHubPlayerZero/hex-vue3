@@ -2,25 +2,47 @@
 <div class="container main my-5"><div class="row"><main class="col post">
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Proxy</h1><small>檔名：<code>proxy.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
-<div id="app"></div>
-<ul>
-  <li>Proxy 的結構</li>
-  <li>Proxy 的運作</li>
-</ul>
-<script type="module">
-// #1 Proxy 結構
-// // 控制器，關鍵知識點：監聽
-// const handler = {
-//   get(obj, prop, value) {
-//     console.log('get:', obj, prop, value);
-//   },
-//   set(obj, prop, newVal) {
-//     console.log('set:', obj, prop, newVal);
-//   }
-// };
 
+
+<div id="app"></div>
+
+<br>
+
+<ul>
+	<li>Proxy 的結構</li>
+	<li>Proxy 的運作</li>
+</ul>
+
+
+<script type="module">
+
+const render = (prop, data) => {
+	const target = document.querySelector("#app");
+	target.innerHTML = `${prop}: ${data}`;
+};
+
+// #1 Proxy 結構
+// 控制器，關鍵知識點：監聽
+const handler = {
+	get(obj, prop, value) {
+		console.log('get:', obj, prop, value);
+		return obj[prop];
+	},
+	set(obj, prop, newVal) {
+		console.log('set:', obj, prop, newVal);
+		obj[prop] = newVal;
+		render(prop, newVal);
+		return newVal;
+	}
+};
+
+const proxyObj = new Proxy({}, handler);
+console.log(`Set proxyObj.name ...`, proxyObj.name = '小明');
+console.log(`proxyObj ==>`, proxyObj);
 
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
   
