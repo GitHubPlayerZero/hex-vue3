@@ -3,21 +3,311 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Reactive</h1><small>檔名：<code>reactive.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
-<div id="app">
-  {{person}}
+
+<p>為標準的 Proxy 做法，只能綁定物件、陣列。</p>
+
+<div id="app" class="mt-4">
+	
+	<h2 class="text-primary">沒有使用 reactive</h2>
+	<p>有綁定，但無法自動重新渲染，需等到渲染機制被觸發時才會更新畫面。</p>
+	
+	<p>
+		不管是直接使用程式改變名字，或是使用 v-model 改變名字，都不會即時重新渲染畫面。<br>
+		需要操作下方有使用 reactive 綁定的範例，觸發了渲染機制，這邊的畫面才會跟著改變。
+	</p>
+	
+	<p class="title">沒有綁 v-model</p>
+	<div class="box mt-1">
+		<p>{{ person }}</p>
+	</div>
+	
+	<p class="title">有綁 v-model</p>
+	<div class="box mt-1">
+		<p>{{ person2 }}</p>
+		<input type="text" v-model="person2.name">
+	</div>
+	
+	<input type="button" value="改變名字" @click="changeName">
+	
+	
+	<h2 class="mt-5 text-primary">使用 reactive</h2>
+	<p>可以即時重新渲染畫面。</p>
+	
+	<p class="title">沒有綁 v-model</p>
+	<div class="box mt-1">
+		<p>{{ reactivePerson2 }}</p>
+		<input type="button" value="改變名字" @click="changeReactiveName2">
+	</div>
+	
+	<p class="title">有綁 v-model</p>
+	<div class="box mt-1">
+		<p>{{ reactivePerson }}</p>
+		<input type="text" v-model="reactivePerson.name">&nbsp;&nbsp;
+		<input type="button" value="改變名字" @click="changeReactiveName">
+	</div>
+	
 </div>
+
+<hr>
+	
+<h2>累加器</h2>
+
+<div id="app2">
+	
+	<p class="title">沒有使用 reactive</p>
+	
+	<p>
+		值有改變但無法自動重新渲染，需等到操作下方使用 reactive 的範例，觸發了渲染機制，這邊的畫面才會改變。
+	</p>
+	
+	<div class="box mt-0">
+		{{ counter }}&nbsp;&nbsp;
+		<input type="button" value="累加" @click="addNum">&nbsp;&nbsp;
+		<input type="button" value="設定為 100" @click="setNum">&nbsp;&nbsp;
+	</div>
+	
+	<p class="title">使用 reactive</p>
+	<div class="box mt-0">
+		{{ reactiveCounter }}&nbsp;&nbsp;
+		<input type="button" value="累加" @click="addReactiveNum">&nbsp;&nbsp;
+		<input type="button" value="設定為 111" @click="setReactiveNum">&nbsp;&nbsp;
+	</div>
+	
+</div>
+
+<hr>
+
+<h2>陣列</h2>
+
+<div id="app3">
+	
+	<p class="title">沒有使用 reactive</p>
+	<div class="box mt-0">
+		{{ ary }}&nbsp;&nbsp;
+		<input type="button" value="Push" @click="pushAry">&nbsp;&nbsp;
+	</div>
+	
+	<p class="title">使用 reactive</p>
+	<div class="box mt-0">
+		{{ reactiveAry }}&nbsp;&nbsp;
+		<input type="button" value="Push" @click="pushReactiveAry">&nbsp;&nbsp;
+	</div>
+	
+</div>
+
+
 <script type="module">
-// import { createApp } from '...';
-const { createApp } = Vue;
+	
+const { createApp, reactive } = Vue;
 
+function createNameProcessor(funcRestoreName, funcChangeName, funcLog)
+{
+	let isChange = false;
+	
+	function changeName()
+	{
+		if (isChange) {
+			funcRestoreName('小明');
+		}
+		else {
+			funcChangeName();
+		}
+		
+		isChange = !isChange;
+		funcLog();
+	}
+	
+	return changeName;
+}
+
+
+/* app */
 const app = createApp({
-  setup() {
-    
-  },
+	setup () {
+		
+		/* 沒有使用 reactive */
+		const person = {
+			name: '小明',
+		};
+		console.log(`person ==>`, person);
+		
+		const person2 = {
+			name: '小明',
+		};
+		console.log(`person2 ==>`, person2);
+		
+		const changeName = createNameProcessor(
+			// funcRestoreName
+			function (originalName) {
+				person.name = originalName;
+				person2.name = originalName;
+			},
+			
+			// funcChangeName
+			function () {
+				person.name = '郭福城';
+				person2.name = '劉的華';
+			},
+			
+			// funcLog
+			function () {
+				console.log(`After change ==>`, person.name, person2.name);
+			}
+		);
+		
+		console.log(``);
+		
+		/* 使用 reactive */
+		const reactivePerson = reactive({
+			name: '小明',
+		});
+		console.log(`reactivePerson ==>`, reactivePerson);
+		
+		const changeReactiveName = createNameProcessor(
+			// funcRestoreName
+			function (originalName) {
+				reactivePerson.name = originalName;
+			},
+			
+			// funcChangeName
+			function () {
+				reactivePerson.name = '陳小村';
+			},
+			
+			// funcLog
+			function () {
+				console.log(`After change reactivePerson ==>`, reactivePerson.name);
+			}
+		);
+		
+		
+		const reactivePerson2 = reactive({
+			name: '小明',
+		});
+		console.log(`reactivePerson2 ==>`, reactivePerson2);
+		
+		const changeReactiveName2 = createNameProcessor(
+			// funcRestoreName
+			function (originalName) {
+				reactivePerson2.name = originalName;
+			},
+			
+			// funcChangeName
+			function () {
+				reactivePerson2.name = '宰宰';
+			},
+			
+			// funcLog
+			function () {
+				console.log(`After change reactivePerson2 ==>`, reactivePerson2.name);
+			}
+		);
+		
+		
+		return {
+			person,
+			person2,
+			changeName,
+			reactivePerson,
+			changeReactiveName,
+			reactivePerson2,
+			changeReactiveName2,
+		};
+	}
 });
+app.mount('#app');
 
-app.mount('#app')
+
+/* app2 */
+const app2 = createApp({
+	setup () {
+		
+		/* 沒有用 reactive */
+		const counter = {
+			num: 0,
+		};
+		
+		function setNum() {
+			counter.num = 100;
+			console.log(`counter.num ==>`, counter.num);
+		}
+		
+		function addNum() {
+			counter.num ++;
+			console.log(`counter.num ==>`, counter.num);
+		}
+		
+		
+		/* 使用 reactive */
+		const reactiveCounter = reactive({
+			num: 0,
+		});
+		
+		function setReactiveNum() {
+			reactiveCounter.num = 111;
+			console.log(`reactiveCounter.num ==>`, reactiveCounter.num);
+		}
+		
+		function addReactiveNum() {
+			reactiveCounter.num ++;
+			console.log(`reactiveCounter.num ==>`, reactiveCounter.num);
+		}
+		
+		
+		return {
+			counter,
+			setNum,
+			addNum,
+			reactiveCounter,
+			setReactiveNum,
+			addReactiveNum,
+		};
+	},
+});
+app2.mount("#app2");
+
+
+function createPushAry(ary)
+{
+	let cnt = 1;
+	
+	function pushAry() {
+		ary.push(`項目${cnt}`);
+		cnt ++;
+		console.log(`ary ==>`, ary);
+	}
+	
+	return pushAry;
+}
+
+
+/* app3 */
+const app3 = createApp({
+	setup () {
+		
+		/* 沒有使用 reactive */
+		let ary = ['aaa', 'bbb'];
+		const pushAry = createPushAry(ary);
+		
+		
+		/* 使用 reactive */
+		let reactiveAry = reactive(['aaa', 'bbb']);
+		const pushReactiveAry = createPushAry(reactiveAry);
+		
+		
+		return {
+			ary,
+			pushAry,
+			reactiveAry,
+			pushReactiveAry,
+		};
+	}
+});
+app3.mount("#app3");
+
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
   

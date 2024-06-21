@@ -50,17 +50,17 @@ optionsApp.mount("#optionsApp");
 const compositionApp = Vue.createApp({
 	setup ()
 	{
-		// 這樣直接賦值，無法與 vue 產生綁定
+		// 這樣直接賦值，無法與畫面渲染產生綁定
 		let num = 2;
 		console.log(`num ==>`, num);
 		
-		// 要使用 ref 綁定 vue
+		// 要使用 ref，才能夠在值改變時自動重新渲染畫面
 		const num2 = Vue.ref(3);
 		console.log(`num2 ==>`, num2);
 		
 		setTimeout(() => {
 			
-			// 值改變，但 vue 綁定的畫面不會改
+			// 值改變，但不會重新渲染畫面
 			num = 10;
 			console.log(`num ==> ${num}`);
 			
