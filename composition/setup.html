@@ -2,28 +2,97 @@
 <div class="container main my-5"><div class="row"><main class="col post">
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Setup 起手式</h1><small>檔名：<code>setup.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
-<div id="app">
-  {{ num }}
-  <button type="button" @click="add">累加</button>
+
+
+<h2>Options API</h2>
+<div id="optionsApp" class="box">
+	{{ num }}
+	&nbsp;
+	<button type="button" @click="add">累加</button>
 </div>
+
+<hr>
+
+<h2>Composition API</h2>
+<div id="compositionApp" class="box">
+	<div class="mb-2">
+		num: {{ num }}
+	</div>
+	<div>
+		num2: {{ num2 }}
+		&nbsp;
+		<button type="button" @click="add">累加</button>
+	</div>
+</div>
+
+
 <script type="module">
 
-const app = Vue.createApp({
-  data() {
-    return {
-      num: 1,
-    }
-  },
-  methods: {
-    add() {
-      this.num++;
-    }
-  },
-});
+// const { createApp, ref } = Vue;
 
-app.mount('#app');
+// Options API
+const optionsApp = Vue.createApp({
+	data() {
+		return {
+			num: 1,
+		}
+	},
+	methods: {
+		add() {
+			this.num ++;
+		}
+	},
+});
+optionsApp.mount("#optionsApp");
+
+
+// Composition API
+const compositionApp = Vue.createApp({
+	setup ()
+	{
+		// 這樣直接賦值，無法與 vue 產生綁定
+		let num = 2;
+		console.log(`num ==>`, num);
+		
+		// 要使用 ref 綁定 vue
+		const num2 = Vue.ref(3);
+		console.log(`num2 ==>`, num2);
+		
+		setTimeout(() => {
+			
+			// 值改變，但 vue 綁定的畫面不會改
+			num = 10;
+			console.log(`num ==> ${num}`);
+			
+			// 使用 ref 綁定的變數，存取值都要透過 .value
+			num2.value = 12;
+			console.log(`num2 ==>`, num2);
+			
+		}, 2000);
+		
+		
+		// methods
+		function add () {
+			num2.value ++;
+		}
+		
+		
+		// 資料、方法 都需要 return
+		return {
+			num,
+			num2,
+			add,
+		};
+	}
+});
+compositionApp.mount('#compositionApp');
+
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
+ 
+<br><br>
 </main>
   
     <aside
