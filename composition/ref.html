@@ -3,22 +3,300 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">ref</h1><small>檔名：<code>ref.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
-<div id="app">
-  {{person}}
-  <input type="text" v-model="num">
+<ul>
+	<li>可以即時重新渲染畫面、可做雙向綁定（v-model）。</li>
+	<li>可以綁定純值、物件、陣列。</li>
+	<li>會被包成 RefImpl 物件。</li>
+	<li>使用時，必須透過 .value 存取值。</li>
+	<li>可以用 .value 替換整個物件。</li>
+</ul>
+
+<h2 class="mt-5">純值</h2>
+
+<div id="valueApp">
+	
+	<div class="box mt-3">
+		
+		<p>{{ name }}</p>
+		
+		<label class="d-block mb-3">
+			名字：<input type="text" v-model="name">
+		</label>
+		
+		<input type="button" value="改變名字" @click="changeName">&nbsp;&nbsp;
+		<input type="button" value="顯示名字" @click="showName">&nbsp;&nbsp;
+		
+	</div>
+	
+	
+	<div class="box mt-1">
+		<p class="title">累加器</p>
+		<input type="button" value="+1" @click="addNum">&nbsp;&nbsp;
+		<input type="button" value="Reset" @click="resetNum">&nbsp;&nbsp;
+		{{ num }}&nbsp;&nbsp;
+	</div>
+	
 </div>
+
+<hr>
+	
+<h2>物件</h2>
+
+<div id="objApp">
+	
+	<div class="box mt-1">
+		<p>{{ person }}</p>
+		
+		<div class="mb-4">
+			<label class="d-block mb-3">
+				自己的名字：<input type="text" v-model="person.name">
+			</label>
+			<label class="d-block">
+				父親的名字：<input type="text" v-model="person.father.name">
+			</label>
+		</div>
+		
+		<input type="button" value="改變自己的名字" @click="changeName">&nbsp;&nbsp;
+		<input type="button" value="改變父親的名字" @click="changeFatherName">&nbsp;&nbsp;
+		<input type="button" value="改變人" @click="changePerson">&nbsp;&nbsp;
+		<input type="button" value="顯示" @click="showPerson">&nbsp;&nbsp;
+	</div>
+	
+</div>
+
+<hr>
+
+<h2>陣列</h2>
+
+<div id="aryApp">
+	
+	<div class="box mt-0">
+		<p>{{ ary }}</p>
+		
+		<div class="flex-btn-group">
+			<input type="button" value="Push" @click="push">
+			<input type="button" value="顯示陣列內容" @click="showAry">
+			<button type="button" @click="reset">Reset</button>
+		</div>
+	</div>
+	
+</div>
+
+
+<script src="./common.js"></script>
+
 <script type="module">
-// import { createApp } from '...';
-const { createApp } = Vue;
+	
+const { createApp, ref } = Vue;
 
-const app = createApp({
-  setup() {
-    
-  },
+
+/* 測試純值 */
+const valueApp = createApp({
+	setup() {
+		
+		console.log(``);
+		console.log(`********** 測試純值 **********`);
+		
+		/* 名字 */
+		const name = ref(getName1());
+		console.log(`name ==>`, name);
+		
+		// 改變名字
+		const changeName = createChangeProcessor(
+			// funcRestore
+			() => {
+				name.value = getName1();
+			},
+			
+			// funcChange
+			() => {
+				name.value = getName2();
+			},
+			
+			// funcLog
+			() => {
+				console.log(`name ==>`, name.value);
+			}
+		);
+		
+		// 顯示名字
+		const showName = () => {
+			console.log(``);
+			console.log(`name ==>`, name);
+		};
+		
+		
+		/* 累加 */
+		const num = ref(0);
+		console.log(`num ==>`, num);
+		
+		const showNum = () => {
+			console.log(``);
+			console.log(`num ==>`, num);
+		};
+		
+		// 累加
+		function addNum() {
+			num.value ++;
+			showNum();
+		}
+		
+		// 歸零
+		function resetNum() {
+			num.value = 0;
+			showNum();
+		}
+		
+		
+		return {
+			// 名字
+			name,
+			changeName,
+			showName,
+			
+			// 累加
+			num,
+			addNum,
+			resetNum,
+		};
+	},
 });
+valueApp.mount('#valueApp');
 
-app.mount('#app')
+
+/* 測試物件 */
+const objApp = createApp({
+	setup() {
+		
+		console.log(``);
+		console.log(`********** 測試物件 **********`);
+		
+		const person = ref(getObj1());
+		console.log(`person ==>`, person);
+		
+		const showPerson = function () {
+			console.log(``);
+			console.log(`person ==>`, person);
+		};
+		
+		// 改變自己的名字
+		const changeName = createChangeProcessor(
+			// funcRestore
+			function () {
+				person.value.name = getName1();
+			},
+			
+			// funcChange
+			function () {
+				person.value.name = getName2();
+			},
+			
+			// funcLog
+			function () {
+				console.log(`My name ==>`, person.value.name);
+			}
+		);
+		
+		// 改變父親的名字
+		const changeFatherName = createChangeProcessor(
+			// funcRestore
+			function () {
+				person.value.father.name = getFatherName1();
+			},
+			
+			// funcChange
+			function () {
+				person.value.father.name = getFatherName2();
+			},
+			
+			// funcLog
+			function () {
+				console.log(`Father's name ==>`, person.value.father.name);
+			}
+		);
+		
+		// 改變整個物件
+		const changePerson = createChangeProcessor(
+			// funcRestore
+			function () {
+				person.value = getObj1();
+			},
+			
+			// funcChange
+			function () {
+				person.value = getObj2();
+			},
+			
+			// funcLog
+			function () {
+				console.log(`person ==>`, person);
+			}
+		);
+		
+		
+		return {
+			person,
+			showPerson,
+			changeName,
+			changeFatherName,
+			changePerson,
+		};
+	}
+});
+objApp.mount("#objApp");
+
+
+/* 測試陣列 */
+const aryApp = createApp({
+	setup () {
+		
+		console.log(``);
+		console.log(`********** 測試陣列 **********`);
+		
+		console.log(getAry1());
+		let ary = ref(getAry1());
+		console.log(`ary ==>`, ary);
+		
+		const aryProcessor = createArrayProcessor(
+			// funcPush
+			(item) => {
+				ary.value.push(item);
+			},
+			
+			// funcReset
+			() => {
+				ary.value = getAry1();
+			},
+			
+			// funcLog
+			() => {
+				console.log(`ary ==>`, ary);
+			}
+		);
+		
+		// Push 陣列
+		const { push } = aryProcessor;
+		
+		// Reset 陣列
+		const { reset } = aryProcessor;
+		
+		// 顯示陣列內容
+		const { show: showAry } = aryProcessor;
+		
+		
+		return {
+			ary,
+			push,
+			reset,
+			showAry,
+		};
+	}
+});
+aryApp.mount("#aryApp");
+
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
   
@@ -52,6 +330,12 @@ app.mount('#app')
         
         active">
       Ref
+    </a>
+	
+    <a href="/composition/noReactiveRef.html"
+      class="list-group-item list-group-item-action
+        ">
+      沒有使用 Reactive 或 Ref
     </a>
   
     <a href="/composition/reactive_ref.html"

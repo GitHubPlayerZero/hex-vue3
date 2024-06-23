@@ -1,43 +1,113 @@
-<!DOCTYPE html><html><head><title>Reactive</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
+<!DOCTYPE html><html><head><title>沒有使用 Reactive 或 Ref</title><meta name="viewport" content="width=device-width, initial-scale=1"><link href="images/favicon.ico" rel="shortcut icon"><meta charset="UTF-8"><script src="/javascripts/vendor.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.js"></script></head><body class="bg-lighter">
 <div class="container main my-5"><div class="row"><main class="col post">
-<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Reactive</h1><small>檔名：<code>reactive.html</code></small></div>
+<!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">沒有使用 Reactive 或 Ref</h1><small>檔名：<code>noReactiveRef.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+<!-- 純值 -->
+<h2>純值</h2>
 
-<ul>
-	<li>可以即時重新渲染畫面、可做雙向綁定（v-model）。</li>
-	<li>為標準的 Proxy 做法，只能綁定物件、陣列。</li>
-	<li>會被包成 Proxy 物件。</li>
-	<li>無法替換整個物件。</li>
-</ul>
-
-<div id="objectApp" class="box mt-4">
+<div id="valueApp">
 	
-	<p>{{ person }}</p>
+	<!-- 沒有使用 reactive 或 ref -->
+	<h3 class="text-primary">沒有使用</h3>
+	<p>即使內容改變了也無法重新渲染畫面。</p>
 	
-	<div class="mb-4">
-		<label class="d-block mb-3">
-			自己的名字：<input type="text" v-model="person.name">
-		</label>
-		<label class="d-block">
-			父親的名字：<input type="text" v-model="person.father.name">
-		</label>
+	<!-- 沒有綁 v-model -->
+	<p class="title">沒有綁 v-model</p>
+	<div class="box mt-1">
+		<p>{{ name }}</p>
 	</div>
 	
-	<div class="flex-btn-group">
-		<input type="button" value="改變自己的名字" @click="changeName">
-		<input type="button" value="改變父親的名字" @click="changeFatherName">
-		<input type="button" value="顯示物件內容" @click="showPerson">
-		<button type="button" @click="changePerson">改變人 (會造成畫面與實際資料脫離綁定，請觀察畫面與 console)</button>
+	<!-- 有綁 v-model -->
+	<p class="title">有綁 v-model</p>
+	<p>會產生奇怪的現象...</p>
+	
+	<ul>
+		<li>v-model 修改的值，不會自動渲染到畫面上，只有在渲染機制被觸發時才會跟著重新渲染。</li>
+		<li>v-model 修改的值，不會設定到資料裡，即使在畫面上看到改變了，實際的資料依然沒變；而實際資料的改變也無法反應到畫面上（即使觸發了渲染機制）。<br>也就是說，畫面與資料是脫勾的狀態。</li>
+	</ul>
+	
+	<div class="box mt-1">
+		<p>{{ name2 }}</p>
+		<input type="text" v-model="name2">
+	</div>
+	
+	<input type="button" value="改變名字" @click="changeName">&nbsp;&nbsp;
+	<input type="button" value="顯示名字" @click="showName">&nbsp;&nbsp;
+	
+	
+	<!-- 使用 ref 觸發渲染 -->
+	<h3 class="mt-5 text-primary">使用 ref 觸發渲染</h3>
+	<p>操作累加以觸發渲染。</p>
+	<p></p>
+	
+	<div class="box mt-1">
+		<input type="button" value="累加" @click="addRefNum">&nbsp;&nbsp;
+		{{ refNum }}
 	</div>
 	
 </div>
 
 <hr>
+
+<!-- 物件 -->
+<h2>物件</h2>
+
+<div id="objectApp" class="mt-4">
 	
+	<!-- 沒有使用 reactive 或 ref -->
+	<h3 class="text-primary">沒有使用</h3>
+	<p>會更新資料，但無法自動重新渲染，需等到渲染機制被觸發時才會更新畫面。</p>
+	
+	<p>
+		不管是直接使用程式改變名字，或是使用 v-model 改變名字，都不會即時重新渲染畫面。<br>
+		需要操作下方有使用 reactive 或 ref 綁定的範例，觸發了渲染機制，這邊的畫面才會跟著改變。
+	</p>
+	
+	<div class="box">
+		<p>{{ person }}</p>
+		
+		<div class="mb-4">
+			<label class="d-block mb-3">
+				自己的名字：<input type="text" v-model="person.name">
+			</label>
+			<label class="d-block">
+				父親的名字：<input type="text" v-model="person.father.name">
+			</label>
+		</div>
+		
+		<div class="flex-btn-group">
+			<input type="button" value="改變自己的名字" @click="changeName">
+			<input type="button" value="改變父親的名字" @click="changeFatherName">
+			<input type="button" value="顯示物件內容" @click="showPerson">
+			<button type="button" @click="changePerson">改變人 (會造成畫面與實際資料脫離綁定，請觀察畫面與 console)</button>
+		</div>
+	</div>
+	
+	
+	<!-- 使用 ref 觸發渲染 -->
+	<h3 class="mt-5 text-primary">使用 ref 觸發渲染</h3>
+	<p>操作累加以觸發渲染。</p>
+	<p></p>
+	
+	<div class="box mt-1">
+		<input type="button" value="累加" @click="addRefNum">&nbsp;&nbsp;
+		{{ refNum }}
+	</div>
+	
+</div>
+
+<hr>
+
+<!-- 陣列 -->
 <h2>陣列</h2>
 
 <div id="aryApp">
+	
+	<!-- 沒有使用 reactive 或 ref -->
+	<h3 class="text-primary">沒有使用</h3>
+	
+	<p>其特性與物件相同，會更新資料，但無法自動重新渲染，需等到渲染機制被觸發時才會更新畫面。</p>
 	
 	<div class="box mt-0">
 		<p>{{ ary }}</p>
@@ -49,6 +119,17 @@
 		</div>
 	</div>
 	
+	
+	<!-- 使用 ref 觸發渲染 -->
+	<h3 class="mt-5 text-primary">使用 ref 觸發渲染</h3>
+	<p>操作累加以觸發渲染。</p>
+	<p></p>
+	
+	<div class="box mt-1">
+		<input type="button" value="累加" @click="addRefNum">&nbsp;&nbsp;
+		{{ refNum }}
+	</div>
+	
 </div>
 
 
@@ -56,7 +137,65 @@
 
 <script type="module">
 
-const { createApp, reactive } = Vue;
+const { createApp, ref } = Vue;
+
+
+/* 測試純值 */
+const valueApp = createApp({
+	setup() {
+		
+		console.log(``);
+		console.log(`********** 測試純值 **********`);
+		
+		/* 沒有使用 reactive 或 ref */
+		let name = getName1();
+		console.log(`name ==>`, name);
+		
+		// 綁 v-model
+		let name2 = getName1();
+		console.log(`name2 ==>`, name2);
+		
+		// 顯示名字
+		const showName = () => {
+			console.log(`name ==>`, name);
+			console.log(`name2 ==>`, name2);
+		};
+		
+		// 改變名字
+		const changeName = createChangeProcessor(
+			// funcRestore
+			() => {
+				name = getName1();
+				name2 = getName1();
+			},
+			
+			// funcChange
+			() => {
+				name = '國父誠';
+				name2 = '劉的滑';
+			},
+			
+			// funcLog
+			showName
+		);
+		
+		
+		/* ref 累加 */
+		const refNum = ref(0);
+		
+		function addRefNum() {
+			refNum.value ++;
+		}
+		
+		
+		return {
+			name, name2,
+			changeName, showName,
+			refNum, addRefNum,
+		}
+	},
+});
+valueApp.mount('#valueApp');
 
 
 /* 測試物件 */
@@ -65,9 +204,9 @@ const objectApp = createApp({
 		
 		console.log(`********** 測試物件 **********`);
 		
-		let person = reactive(getObj1());
+		/* 沒有使用 reactive 或 ref */
+		let person = getObj1();
 		console.log(`person ==>`, person);
-		
 		
 		// 改變自己的名字
 		const changeName = createChangeProcessor(
@@ -87,7 +226,6 @@ const objectApp = createApp({
 			}
 		);
 		
-		
 		// 改變父親的名字
 		const changeFatherName = createChangeProcessor(
 			// funcRestore
@@ -106,17 +244,16 @@ const objectApp = createApp({
 			}
 		);
 		
-		
 		// 改變整個物件
 		const changePerson = createChangeProcessor(
 			// funcRestore
 			() => {
-				person = reactive(getObj1());
+				person = getObj1();
 			},
 			
 			// funcChange
 			() => {
-				person = reactive(getObj2());
+				person = getObj2();
 			},
 			
 			// funcLog
@@ -125,12 +262,21 @@ const objectApp = createApp({
 			}
 		);
 		
-		
 		// 顯示物件內容
 		const showPerson = () => {
 			console.log(``);
 			console.log(`person ==>`, person);
 		};
+		
+		console.log(``);
+		
+		
+		/* ref 累加 */
+		const refNum = ref(0);
+		
+		function addRefNum() {
+			refNum.value ++;
+		}
 		
 		
 		return {
@@ -139,10 +285,26 @@ const objectApp = createApp({
 			changeFatherName,
 			changePerson,
 			showPerson,
+			refNum, addRefNum,
 		};
+		
 	}
 });
 objectApp.mount('#objectApp');
+
+
+function createPushAry(ary)
+{
+	let cnt = 1;
+	
+	function pushAry() {
+		ary.push(`項目${cnt}`);
+		cnt ++;
+		console.log(`ary ==>`, ary);
+	}
+	
+	return pushAry;
+}
 
 
 /* 測試陣列 */
@@ -152,7 +314,8 @@ const aryApp = createApp({
 		console.log(``);
 		console.log(`********** 測試陣列 **********`);
 		
-		let ary = reactive(getAry1());
+		/* 沒有使用 reactive 或 ref */
+		let ary = getAry1();
 		console.log(`ary ==>`, ary);
 		
 		const aryProcessor = createArrayProcessor(
@@ -163,7 +326,7 @@ const aryApp = createApp({
 			
 			// funcReset
 			() => {
-				ary = reactive(getAry1());
+				ary = getAry1();
 			},
 			
 			// funcLog
@@ -182,11 +345,20 @@ const aryApp = createApp({
 		const { show: showAry } = aryProcessor;
 		
 		
+		/* ref 累加 */
+		const refNum = ref(0);
+		
+		function addRefNum() {
+			refNum.value ++;
+		}
+		
+		
 		return {
 			ary,
 			push,
 			reset,
 			showAry,
+			refNum, addRefNum,
 		};
 	}
 });
@@ -219,7 +391,7 @@ aryApp.mount("#aryApp");
     <a href="/composition/reactive.html"
       class="list-group-item list-group-item-action
         
-        active">
+        ">
       Reactive
     </a>
   
@@ -232,10 +404,10 @@ aryApp.mount("#aryApp");
 	
 	<a href="/composition/noReactiveRef.html"
       class="list-group-item list-group-item-action
-        ">
+	  	active">
       沒有使用 Reactive 或 Ref
     </a>
-  
+	
     <a href="/composition/reactive_ref.html"
       class="list-group-item list-group-item-action
         

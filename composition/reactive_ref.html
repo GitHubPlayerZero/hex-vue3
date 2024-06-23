@@ -3,30 +3,42 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">reactive 與 ref</h1><small>檔名：<code>reactive_ref.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+
 <div id="app">
-  
+	
 </div>
+
+
 <script type="module">
+
 const { createApp, reactive, ref } = Vue;
 
 const app = createApp({
-  setup() {
-    const person = ref({
-      name: '卡斯伯'
-    });
-    const person2 = reactive({
-      name: '卡斯伯',
-    });
-    
+	setup() {
+		
+		const person = ref({
+			name: '卡斯伯'
+		});
+		
+		const person2 = reactive({
+			name: '卡斯伯',
+		});
+		
+		const name = ref('卡斯伯');
+		
 
-    return {
 
-    }
-  },
+		return {
+
+		}
+	},
 });
 
-app.mount('#app')
+app.mount('#app');
+
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
   
