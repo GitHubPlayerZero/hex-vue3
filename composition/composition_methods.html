@@ -3,26 +3,68 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Composition 與 Methods</h1><small>檔名：<code>composition_methods.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
-<div id="app">
-  {{ num }}
-  <button type="button">累加</button>
-  <button type="button">取得累加次數</button>
+<ul>
+	<li>
+		不需要使用 this。<br>
+		因為資料、函式都放在 setup 函式中，因此使用資料時不需要使用 this，因此 methods 使用傳統函式或箭頭函式都可以。
+	</li>
+	<li>不需要匯出到畫面上的資料，可以不綁 reactive、ref，也不用 return。</li>
+</ul>
+
+
+<div id="app" class="box">
+	<p>目前數值：{{ num }}</p>
+	
+	<div class="mb-3">
+		<label>
+			加多少？ <input type="number" v-model="numValue" style="width: 70px;">
+		</label>
+		&nbsp;&nbsp;
+		<button type="button" @click="addNumValue">累加</button>
+	</div>
+	<div>
+		<button type="button" @click="showCountTime">顯示累加次數</button>
+	</div>
 </div>
+
+
 <script type="module">
+
 const { createApp, ref } = Vue;
 
 const app = createApp({
-  setup() {
-    const num = ref(1);
+	setup() {
+		const num = ref(0);
+		const numValue = ref(1);
+		
+		let cnt = 0;	// 不需要匯出到畫面上，可以不綁 ref，也不用 return
+		
+		// 累加
+		function addNumValue() {
+			num.value += numValue.value;
+			cnt ++;
+		}
+		
+		// 顯示累加次數
+		const showCountTime = () => {
+			console.log(`cnt = ` + cnt);
+			alert(`現在已累加 ${cnt} 次`);
+		};
 
-    return {
-      num,
-    }
-  },
+		return {
+			num,
+			numValue,
+			addNumValue,
+			showCountTime,
+		}
+	},
 });
 
-app.mount('#app')
+app.mount('#app');
+
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
   
