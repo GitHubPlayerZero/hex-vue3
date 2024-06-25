@@ -3,41 +3,170 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Props</h1><small>檔名：<code>props.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+
 <div id="app">
-  <card></card>
+	<p>{{ person }}</p>
+	<card :person-obj="person" num="123"></card>
 </div>
+
+
 <script type="module">
-// import { createApp } from '...';
+	
 const { createApp, ref, toRef } = Vue;
 
 const card = {
-  template: `<div class="card" style="width: 18rem;">
-    <div class="card-body">
-      <h5 class="card-title"></h5>
-    </div>
-  </div>`,
-  setup() {
-
-  }
-}
+	template: ``
+		+ `<div class="card">`
+		+ `<div class="card-body">`
+		+ `<h5 class="card-title"></h5>`
+		+ `<div class="box">`
+		+ `<p class="bold">物件會自動被包裝為 Proxy，自然地與畫面綁定。</p>`
+		+ `<p>personObj：{{ personObj }}</p>`
+		+ `<p>
+			personObj.name：<input type="text" v-model="personObj.name">&nbsp;&nbsp;
+			<button type="button" @click="showPersonObj">顯示 personObj</button>
+			</p>`
+		+ `<p>
+			personObj.father.name：<input type="text" v-model="personObj.father.name">&nbsp;&nbsp;
+			<button type="button" @click="showFather">顯示 father</button>
+			</p>`
+		+ `<br>`
+		+ `<p class="bold">由物件中取出的純值無法自動與畫面綁定。</p>`
+		+ `<p>
+			name：<input type="text" v-model="name"> {{ name }}&nbsp;&nbsp;
+			<button type="button" @click="showName">顯示 name</button>
+			</p>`
+		+ `<br>`
+		+ `<p class="bold">需要自己使用 ref 包裝純值才能與畫面綁定。</p>`
+		+ `<p>
+			refName：<input type="text" v-model="refName"> {{ refName }}&nbsp;&nbsp;
+			<button type="button" @click="showRefName">顯示 refName</button>
+			</p>`
+		+ `</div>`
+		+ `<div class="box">`
+		+ `<p class="bold">由 props 中取出的純值無法自動與畫面綁定。</p>`
+		+ `<p>
+			num：{{ num }}&nbsp;&nbsp;&nbsp;<input type="num" v-model="num">&nbsp;&nbsp;
+			<button type="button" @click="showNum">顯示 num</button>
+			</p>`
+		+ `<br>`
+		+ `<p class="bold">需要自己使用 ref 包裝純值才能與畫面綁定。</p>`
+		+ `<p>
+			refNum：{{ refNum }}&nbsp;&nbsp;&nbsp;<input type="refNum" v-model="refNum">&nbsp;&nbsp;
+			<button type="button" @click="showRefNum">顯示 refNum</button>
+			</p>`
+		+ `</div>`
+		+ `</div>`
+		+ `</div>`
+		+ ``,
+	
+	// 與 Options API 一樣，要定義 props
+	props: ['personObj', 'num'],
+	
+	// 父元件傳入的 props 會以 Proxy 包裝後，以第一個參數傳入 setup
+	setup (param1) {
+		console.log(`param1 ==>`, param1);
+		console.log(``);
+		
+		/*
+			注意：
+			1. 由 props 取出的若是物件 (不管是直接取屬性或是解構)，如 personObj，其原本即為 Proxy 物件，自然地與畫面綁定。
+			2. 由 props 取出的若是純值，如 num，則無法與畫面綁定。
+				若想與畫面綁定，需要自己使用 ref 的方式。
+		*/
+		// 可以直接使用取出物件屬性的方式
+		// const personObj = param1.personObj;
+		// const num = param1.num;
+		const refNum = ref(param1.num);
+		
+		// 也可以使用解構的方式
+		const { personObj, num } = param1;
+		
+		console.log(`personObj ==>`, personObj);
+		console.log(`num ==>`, num);
+		console.log(`refNum ==>`, refNum);
+		
+		const showPersonObj = () => {
+			console.log(``);
+			console.log(`personObj ==>`, personObj);
+		};
+		
+		const showNum = () => {
+			console.log(``);
+			console.log(`num ==>`, num);
+		};
+		const showRefNum = () => {
+			console.log(``);
+			console.log(`refNum.value ==>`, refNum.value);
+		};
+		
+		console.log(``);
+		
+		
+		/*
+			由物件中取出屬性成為新的變數
+			1. 取出的屬性若為物件 (不管是直接取屬性或是解構)，如 personObj.father，其會被自動包裝為 Proxy 物件，自然地與畫面綁定，也會影响原物件。
+			2. 取出的屬性若為純值，如 personObj.name，則無法與畫面綁定。
+				若想與畫面綁定，需要自己使用 ref 的方式。
+				要注意的是，由物件取出純值所構成的新變數，已與原物件脫勾；若想要的是操作原物件，那應該要使用「物件.屬性」的方式。
+		*/
+		// const father = personObj.father;
+		const { father } = personObj;
+		const { name } = personObj;
+		const refName = ref(personObj.name);
+		console.log(`father ==>`, father);
+		console.log(`name ==>`, name);
+		console.log(`refName ==>`, refName);
+		
+		const showFather = () => {
+			console.log(``);
+			console.log(`father ==>`, father);
+		};
+		
+		const showName = () => {
+			console.log(``);
+			console.log(`name ==>`, name);
+		};
+		const showRefName = () => {
+			console.log(``);
+			console.log(`refName.value ==>`, refName.value);
+		};
+		
+		
+		return {
+			personObj, num, refNum,
+			showPersonObj, showNum, showRefNum,
+			name, refName,
+			showFather, showName, showRefName,
+		}
+	}
+};
 
 const app = createApp({
-  components: {
-    card,
-  },
-  setup() {
-    const person = ref({
-      name: '卡斯伯'
-    });
+	components: {
+		card,
+	},
+	
+	setup () {
+		const person = ref({
+			name: '小明',
+			age: 20,
+			father: {
+				name: '老明',
+			},
+		});
 
-    return {
-      person
-    }
-  },
+		return {
+			person
+		}
+	},
 });
 
-app.mount('#app')
+app.mount('#app');
+
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
   
