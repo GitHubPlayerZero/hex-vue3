@@ -3,49 +3,71 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Context</h1><small>檔名：<code>context.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
+
 <div id="app">
-  <card ></card>
+	<!-- 使用 emit 事件：push-data -->
+	<card @push-data="getData"></card>
 </div>
+
 <script type="module">
+
 const { createApp, ref } = Vue;
 
 const card = {
-  template: `<div class="card" style="width: 18rem;">
-    <div class="card-body">
-      <button type="text" class="btn btn-primary"
-      @click="pushData">送出資料</button>
-    </div>
-  </div>`,
-  setup(props) {
-    function pushData() {
-      console.log('pushData');
-    }
+	template: `<div class="card" style="width: 18rem;">
+<div class="card-body">
+	<button type="text" class="btn btn-primary"
+	@click="pushData">送出資料</button>
+</div>
+</div>`,
 
-    return {
-      pushData
-    }
+	// setup (props, context) {
+	// 可以直接將 context 解構提取出 emit
+	setup (props, { emit }) {
+		
+		// console.log(`context ==>`, context);
+		
+		// 可以取出 context 裡的 emit 屬性
+		// console.log(`emit ==>`, context.emit);
+		
+		console.log(`emit ==>`, emit);
+		
+		
+		function pushData() {
+			console.log('[子元件] pushData ...');
+			// 註冊 emit 事件：push-data
+			emit('push-data', '子元件向外傳遞的資料');
+		}
 
-  }
-}
+		return {
+			pushData,
+		}
+
+	}
+};
 
 const app = createApp({
-  components: {
-    card,
-  },
-  setup() {
-    const person = ref({
-      name: '卡斯伯'
-    });
+	components: {
+		card,
+	},
+	
+	setup () {
+		function getData(text) {
+			console.log(`[父元件] getData ...`);
+			console.log(`接收到的 emit 資料 ==>`, text);
+		}
 
-    return {
-      person,
-      
-    }
-  },
+		return {
+			getData,
+		}
+	},
 });
 
-app.mount('#app')
+app.mount('#app');
+
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
   
