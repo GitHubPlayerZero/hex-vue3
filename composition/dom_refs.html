@@ -3,47 +3,149 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">$Refs</h1><small>檔名：<code>dom_refs.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
-<div id="app">
-  <button type="button" ref="btn">這裡有一個按鈕</button>
-  <card ref="card"></card>
-</div>
-<script type="module">
-const { createApp, ref } = Vue;
 
+<div id="app">
+	<p ref="p1">我是父元件的 ref P 段落</p>
+	<p>{{ p2 }}</p>
+	
+	<button type="button" @click="changeP1">父元件改變自己的 P 段落內容</button>
+	
+	<card ref="card" class="mb-3 mt-4"></card>
+	
+	<div class="flex-btn-group">
+		<button type="button" @click="changeCardTitle">父元件改變子元件標題</button>
+		<button type="button" @click="callCardSetTitle">父元件呼叫子元件的方法 (修改標題)</button>
+	</div>
+	
+	<div class="flex-btn-group">
+		<button type="button" @click="changeCardContent">父元件改變子元件內容</button>
+		<button type="button" @click="changeCardContent2">父元件改變子元件內容 2</button>
+	</div>
+</div>
+
+
+<script type="module">
+
+const { createApp, ref, onMounted } = Vue;
+
+// 子元件
 const card = {
-  template: `<div class="card" style="width: 18rem;">
-    <div class="card-body">
-      <h5 class="card-title"></h5>
-    </div>
-  </div>`,
-  setup(props, context) {
-    function getConsole() {
-      console.log(context);
-    }
-    
-    return {
-      getConsole
-    }
-  }
+	template: `<div class="card" style="width: 18rem;">
+<div class="card-body">
+	<h5 class="card-title">{{ title }}</h5>
+	<div>
+		<p>{{ content }}</p>
+	</div>
+	<div><input type="button" value="修改標題" @click="setTitle()"></div>
+</div>
+</div>`,
+
+	setup(props, context) {
+		
+		console.log(`[子元件] ...... start`);
+		
+		// const title = '我是子元件標題';
+		// const content = '我是子元件內容';
+		const title = ref('我是子元件標題');
+		const content = ref('我是子元件內容');
+		
+		function setTitle(text) {
+			console.log(`text =`, text);
+			if (!text) {
+				text = "我是子元件標題 (setTitle)";
+			}
+			title.value = text;
+		}
+		
+		console.log(`[子元件] ...... end`);
+		console.log(``);
+		
+		return {
+			title, content,
+			setTitle,
+		}
+	}
 }
 
+// 父元件
 const app = createApp({
-  components: {
-    card,
-  },
-  setup() {
-    const person = ref({
-      name: '卡斯伯'
-    });
+	components: {
+		card,
+	},
+	
+	setup() {
+		// 官方範例給入 null，到 mounted 生命週期就會被改變
+		const p1 = ref(null);	// 父元件 ref P 段落
+		
+		const p2 = ref("我是父元件沒有 ref 的 P 段落");	// 父元件沒有做 ref 的 P 段落
+		
+		// 即使給入值也可以，到 mounted 生命週期仍然會被改變
+		const card = ref("card");
+		
+		console.log(`p1 ==>`, p1);
+		console.log(`value ==>`, p1.value);
+		console.log(``);
+		console.log(`p2 ==>`, p2);
+		console.log(`value ==>`, p2.value);
+		console.log(``);
+		console.log(`card ==>`, card);
+		console.log(`value ==>`, card.value);
+		
+		function changeP1() {
+			console.log(`[changeP1] ...`);
+			p1.value.textContent += " (被修改了)";
+		}
+		
+		function changeCardTitle() {
+			console.log(`[changeCardTitle] ...`);
+			card.value.title = "父元件改變了子元件標題";
+		}
+		
+		function callCardSetTitle() {
+			console.log(`[callCardSetTitle] ...`);
+			card.value.setTitle('父元件呼叫子元件方法修改標題');
+		}
+		
+		function changeCardContent() {
+			console.log(`[changeCardContent] ...`);
+			card.value.content = "父元件改變了子元件內容";
+		}
+		function changeCardContent2() {
+			console.log(`[changeCardContent2] ...`);
+			card.value.content = "父元件改變了子元件內容 2";
+		}
+		
+		console.log(``);
+		
+		// 在 mounted 生命週期，有設定 ref 的元素就會自動被改變。
+		onMounted(() => {
+			console.log(`[onMounted] ...`);
+			
+			console.log(`p1 ==>`, p1);
+			console.log(`value ==>`, p1.value);
+			console.log(``);
+			console.log(`p2 ==>`, p2);
+			console.log(`value ==>`, p2.value);
+			console.log(``);
+			console.log(`card ==>`, card);
+			console.log(`value ==>`, card.value);
+			
+		});
 
-    return {
-      person,
-    }
-  },
+		return {
+			p1, p2,
+			changeP1,
+			card,
+			changeCardTitle, callCardSetTitle,
+			changeCardContent, changeCardContent2,
+		}
+	},
 });
+app.mount('#app');
 
-app.mount('#app')
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
   
