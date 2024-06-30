@@ -3,52 +3,327 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">Watch</h1><small>檔名：<code>composition_watch.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
-<div id="app">
-  {{ watchText }}
-  <input type="text" v-model="productName">
-  <br>
-  {{ watchText2 }}
-  <input type="text" v-model="product.other.name">
 
+<!-- 監聽純值 -->
+<h2>監聽純值</h2>
+<div id="app1">
+	<div class="box">
+		<p><input type="text" v-model="productName"></p>
+		<p>{{ watchValue }}</p>
+	</div>
 </div>
+
+<hr>
+
+
+<!-- 監聽物件 -->
+<h2>監聽物件</h2>
+
+<div id="app2">
+	
+	<!-- Ref -->
+	<h3>Ref</h3>
+	
+	<div class="box">
+		<label class="d-block mb-3">
+			refProduct.name：<input type="text" v-model="refProduct.name">
+		</label>
+		
+		<label class="d-block mb-3">
+			refProduct.other.name：<input type="text" v-model="refProduct.other.name">
+		</label>
+		
+		<p>{{ watchRefObj }}</p>
+	</div>
+	
+	<!-- Reactive -->
+	<h3>Reactive</h3>
+	
+	<div class="box">
+		<label class="d-block mb-3">
+			reactiveProduct.name：<input type="text" v-model="reactiveProduct.name">
+		</label>
+		
+		<label class="d-block mb-3">
+			reactiveProduct.other.name：<input type="text" v-model="reactiveProduct.other.name">
+		</label>
+		
+		<p>{{ watchReactiveObj }}</p>
+	</div>
+	
+</div>
+
+<hr>
+
+
+<!-- 多值監聽 -->
+<h2>多值監聽</h2>
+
+<div id="app3">
+	
+	<!-- 純值 -->
+	<h3>純值</h3>
+	
+	<div class="box">
+		<label>
+			productName：<input type="text" v-model="productName"></label>
+	</div>
+	
+	<!-- Ref -->
+	<h3>Ref</h3>
+	
+	<div class="box">
+		<label class="d-block mb-3">
+			refProduct.name：<input type="text" v-model="refProduct.name">
+		</label>
+		
+		<label class="d-block mb-3">
+			refProduct.other.name：<input type="text" v-model="refProduct.other.name">
+		</label>
+	</div>
+	
+	<!-- Reactive -->
+	<h3>Reactive</h3>
+	
+	<div class="box">
+		<label class="d-block mb-3">
+			reactiveProduct.name：<input type="text" v-model="reactiveProduct.name">
+		</label>
+		
+		<label class="d-block mb-3">
+			reactiveProduct.other.name：<input type="text" v-model="reactiveProduct.other.name">
+		</label>
+	</div>
+	
+</div>
+
+
+
 <script type="module">
-const { createApp, ref, reactive } = Vue;
 
-const app = createApp({
+const { createApp, ref, reactive, watch } = Vue;
 
-  setup(props) {
-    
-    // 監聽純值
-    const productName = ref('蛋餅');
-    const watchText = ref('');
-
-
-
-    // 監聽物件
-    // # ref, reactive 在此運作相同
-    const product = ref({
-      name: '蛋餅',
-      price: 30,
-      vegan: false,
-      other: {
-        name: '送安檢'
-      }
-    });
-    const watchText2 = ref('');
+// 執行 watch 共用邏輯
+const executeWatch = (newVal, oldVal) => {
+	console.log(``);
+	console.log(`[watch]`);
+	console.log(`newVal ==>`, newVal);
+	console.log(`oldVal ==>`, oldVal);
+	
+	return `輸入的文字有 ${newVal.length} 個字，上一次有 ${oldVal.length} 個字。`;
+};
 
 
-
-    return {
-      product,
-      productName,
-      watchText,
-      watchText2
-    }
-  },
+/* 監聽純值 */
+const app1 = createApp({
+	setup() {
+		
+		const watchValue = ref('');
+		const productName = ref('蛋餅');
+		
+		watch(
+			productName, 
+			(newVal, oldVal) => {
+				watchValue.value = executeWatch(newVal, oldVal);
+			},
+			// { immediate: true },
+		);
+		
+		return {
+			productName,
+			watchValue,
+		}
+	},
 });
+app1.mount('#app1');
 
-app.mount('#app')
+
+/* 監聽物件 */
+const app2 = createApp({
+	setup() {
+		
+		/* Ref 物件 */
+		const watchRefObj = ref('');
+		
+		const refProduct = ref({
+			name: '蛋餅',
+			price: 30,
+			vegan: false,
+			other: {
+				name: '送安檢'
+			}
+		});
+		console.log(refProduct);
+		
+		// 監聽純值 refProduct.name
+		watch(
+			// refProduct.value.name,	// 會發生 Invalid watch source 警告
+			() => refProduct.value.name,	// 必須使用返回此屬性的 getter 函式
+			(newVal, oldVal) => {
+				watchRefObj.value = executeWatch(newVal, oldVal);
+			},
+		);
+		
+		// 監聽純值 refProduct.other.name
+		watch(
+			() => refProduct.value.other.name,
+			(newVal, oldVal) => {
+				watchRefObj.value = executeWatch(newVal, oldVal);
+			},
+		);
+		
+		// 監聽物件 refProduct.other
+		watch(
+			refProduct.value.other,	// 從 .value 中取出物件
+			(newVal, oldVal) => {
+				console.log(``);
+				console.log(`[watch] refProduct.value.other ...`);
+				console.log(newVal, oldVal);
+				console.log(`newVal === oldVal ==>`, newVal === oldVal);
+			},
+		);
+		
+		// 監聽物件 refProduct
+		watch(
+			// refProduct.value,	// 從 .value 中取出物件
+			refProduct,	// 直接監聽整個 RefImpl 物件，需搭配深層監聽參數 (deep: true)
+			(newVal, oldVal) => {
+				console.log(``);
+				console.log(`[watch] refProduct ...`);
+				console.log(newVal, oldVal);
+				console.log(`newVal === oldVal ==>`, newVal === oldVal);
+				console.log(newVal.name, newVal.other.name);
+			},
+			{ deep: true }	// 深層監聽參數
+		);
+		
+		
+		/* Reactive 物件 */
+		const watchReactiveObj = ref('');
+		
+		const reactiveProduct = reactive({
+			name: '蛋餅',
+			price: 30,
+			vegan: false,
+			other: {
+				name: '送安檢'
+			}
+		});
+		
+		// 監聽純值 reactiveProduct.name
+		watch(
+			// reactiveProduct.name,	// 會發生 Invalid watch source 警告
+			() => reactiveProduct.name,	// 必須使用返回此屬性的 getter 函式
+			(newVal, oldVal) => {
+				watchReactiveObj.value = executeWatch(newVal, oldVal);
+			},
+		);
+		
+		// 監聽純值 reactiveProduct.other.name
+		watch(
+			() => reactiveProduct.other.name,
+			(newVal, oldVal) => {
+				watchReactiveObj.value = executeWatch(newVal, oldVal);
+			},
+		);
+		
+		// 監聽物件 reactiveProduct.other
+		watch(
+			reactiveProduct.other,
+			(newVal, oldVal) => {
+				console.log(``);
+				console.log(`[watch] reactiveProduct.other ...`);
+				console.log(newVal, oldVal);
+				console.log(`newVal === oldVal ==>`, newVal === oldVal);
+			},
+		);
+		
+		// 監聽物件 reactiveProduct
+		watch(
+			reactiveProduct,
+			(newVal, oldVal) => {
+				console.log(``);
+				console.log(`[watch] reactiveProduct ...`);
+				console.log(newVal, oldVal);
+				console.log(`newVal === oldVal ==>`, newVal === oldVal);
+				console.log(newVal.name, newVal.other.name);
+			},
+		);
+		
+
+		return {
+			refProduct, reactiveProduct,
+			watchRefObj, watchReactiveObj,
+		}
+	},
+});
+app2.mount('#app2');
+
+
+/* 多值監聽 */
+const app3 = createApp({
+	setup () {
+		
+		// 純值
+		const productName = ref('蛋餅');
+		
+		// Ref 物件
+		const refProduct = ref({
+			name: '蛋餅',
+			price: 30,
+			vegan: false,
+			other: {
+				name: '送安檢'
+			}
+		});
+		
+		// Reactive 物件
+		const reactiveProduct = reactive({
+			name: '蛋餅',
+			price: 30,
+			vegan: false,
+			other: {
+				name: '送安檢'
+			}
+		});
+		
+		
+		// 監聽多個值
+		watch(
+			// 由於 refProduct 為 Ref 綁定的物件，因此要使用 .value 才能監聽
+			// [productName, refProduct.value, reactiveProduct],
+			
+			// 若 refProduct 不使用 .value，就要設定深層監聽模式 (deep: true)
+			[productName, refProduct, reactiveProduct],
+			
+			([newProductName, newRefProduct, newReactiveProduct], [oldProductName, oldRefProduct, oldReactiveProduct]) => {
+				console.log(``);
+				console.log(`[watch]`);
+				
+				console.log(`productName ==>`, newProductName, oldProductName);
+				
+				console.log(`refProduct ==>`, newRefProduct);
+				console.log(newRefProduct.name, newRefProduct.other.name);
+				
+				console.log(`reactiveProduct ==>`, newReactiveProduct);
+				console.log(newReactiveProduct.name, newReactiveProduct.other.name);
+			},
+			{ deep: true }	// 深層監聽
+		);
+		
+		
+		return {
+			productName,
+			refProduct,
+			reactiveProduct,
+		};
+	},
+});
+app3.mount("#app3");
+
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
   

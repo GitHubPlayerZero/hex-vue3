@@ -3,43 +3,74 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">WatchEffect</h1><small>檔名：<code>composition_watchEffect.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 
-<div id="app">
-  {{ watchText }}
-  <input type="text" v-model="productName">
-  <br>
-  <input type="text" v-model="product.name">
 
+<div id="app">
+	
+	<label class="d-block mb-2">
+		誰：
+		<input type="text" v-model="who">
+	</label>
+	
+	<label class="d-block mb-4">
+		買了：
+		<input type="text" v-model="product.name">
+	</label>
+	
+	<p>{{ watchText }}</p>
+	<p>{{ countText }}（觸發 10 次之後就會停止監聽）</p>
+	
 </div>
+
+
 <script type="module">
-const { createApp, ref, reactive } = Vue;
+
+const { createApp, ref, reactive, watchEffect } = Vue;
 
 const app = createApp({
+	setup() {
+		
+		const who = ref('媽媽');
 
-  setup(props) {
-    const productName = ref('蛋餅');
+		const product = ref({
+			name: '蛋餅',
+			price: 30,
+			vegan: false,
+			other: {
+				name: '送安檢'
+			}
+		});
 
-    const product = ref({
-      name: '蛋餅',
-      price: 30,
-      vegan: false,
-      other: {
-        name: '送安檢'
-      }
-    });
-
-    const watchText = ref('');
-
-
-    return {
-      product,
-      productName,
-      watchText,
-    }
-  },
+		const watchText = ref('');
+		const countText = ref('');
+		
+		let count = 0;
+		
+		const stopWatch = watchEffect(() => {
+			console.log(`[watch] ... ${count}`);
+			watchText.value = `${who.value} 買了 ${product.value.name}`;
+			countText.value = `觸發了 ${++count} 次`;
+			
+			// 觸發 10 次之後停止監聽
+			if (count >= 10) {
+				stopWatch();
+			}
+		});
+		
+		
+		return {
+			product,
+			who,
+			watchText,
+			countText,
+		}
+	},
 });
 
-app.mount('#app')
+app.mount('#app');
+
 </script>
+
+
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>
   
