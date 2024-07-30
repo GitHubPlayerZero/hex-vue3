@@ -47,11 +47,15 @@
 		</p>
 		
 		<p>
-			注意：
-			<br>
-			這樣的做法可能會產生一些奇怪現象... 
-			<br>
-			當輸入文數字混合的資料時，開頭為數字和開頭為文字的判斷結果會不同。
+			然而，這樣的做法需要注意一些特性：
+			<ol>
+				<li class="mb-2">不會限制只能輸入數字。</li>
+				<li class="mb-2">若開頭輸入的是文字，輸入的值會進到 Vue 資料中，並被判斷為文字 (string)。</li>
+				<li>
+					若開頭輸入的是數字，輸入的值會進到 Vue 資料中，並被判斷為數字 (number)。<br>
+					但是，若後續接續文字，在畫面上雖然能鍵入文字，但文字的部份不會進到 Vue 資料中，而判斷也仍然為數字 (number)，這可能會造成奇怪的體驗。
+				</li>
+			</ol>
 		</p>
 		<input type="text" class="form-control" v-model.number="numberMsg">
 	</div>
@@ -69,6 +73,8 @@
 	
 	<!-- 將前後空白刪除 -->
 	<h3 class="mt-3">修剪 Trim</h3>
+	<p>將前後兩端的空格刪除，不管是半形或全型空格都可以刪除。</p>
+	
 	<p style="white-space: pre;">結果：<span class="result">{{ trimMsg }}</span></p>
 	
 	沒有 trim：<input type="text" class="form-control" v-model="trimMsg">
